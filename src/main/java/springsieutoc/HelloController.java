@@ -9,7 +9,7 @@
  * Copyright (c) 2025 Hỏi Dân IT. All Rights Reserved.
  */
 
-package vn.hoidanit.springsieutoc;
+package springsieutoc;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
