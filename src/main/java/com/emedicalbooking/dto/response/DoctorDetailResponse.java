@@ -1,5 +1,6 @@
 package com.emedicalbooking.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +17,12 @@ public class DoctorDetailResponse {
     private String lastName;
     private String image; // base64
     private AllCodeResponse positionData;
+    private AllCodeResponse roleData;
 
+    @JsonProperty("Markdown")
     private MarkdownData markdown;
+
+    @JsonProperty("DoctorInfo")
     private DoctorInfoData doctorInfo;
 
     @Data

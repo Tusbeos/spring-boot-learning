@@ -42,6 +42,10 @@ public class DoctorInfos {
     private Specialty specialty;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "clinicId")
+    private Clinic clinic;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "priceId")
     private AllCode priceData;
 

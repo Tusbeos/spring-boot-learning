@@ -17,4 +17,5 @@ public class DoctorListResponse {
     private String image; // base64
     private AllCodeResponse positionData;
     private AllCodeResponse genderData;
+    private int count; // số lượt đặt — dùng cho TopDoctor
 }

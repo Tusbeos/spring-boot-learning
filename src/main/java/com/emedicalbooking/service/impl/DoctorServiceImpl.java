@@ -34,11 +34,11 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     @Transactional(readOnly = true)
     public List<DoctorListResponse> getTopDoctors(int limit) {
-        // Lấy tất cả doctors (role R2), sắp xếp theo count trong DoctorInfos
-        return userRepository.findAllWithRelations().stream()
-                .filter(u -> u.getRoleData() != null && "R2".equals(u.getRoleData().getKeyMap()))
+        // Chỉ lấy bác sĩ có count >= 10, sắp xếp giảm dần theo count
+        return doctorInfosRepository.findByCountGreaterThanEqualOrderByCountDesc(10)
+                .stream()
                 .limit(limit)
-                .map(this::toDoctorListResponse)
+                .map(info -> toDoctorListResponse(info.getDoctor(), info.getCount()))
                 .collect(Collectors.toList());
     }
 
@@ -86,13 +86,15 @@ public class DoctorServiceImpl implements DoctorService {
         doctorInfo.setPaymentData(findAllCode(request.getSelectedPayment()));
         doctorInfo.setProvinceData(findAllCode(request.getSelectedProvince()));
 
-        doctorInfosRepository.save(doctorInfo);
-
         // Rebuild DoctorClinicSpecialty
         doctorClinicSpecialtyRepository.deleteAllByDoctorId(doctorId);
 
         Clinic clinic = clinicRepository.findById(request.getClinicId())
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", request.getClinicId()));
+
+        // Lưu clinic trực tiếp vào DoctorInfos để tra cứu nhanh theo clinic
+        doctorInfo.setClinic(clinic);
+        doctorInfosRepository.save(doctorInfo);
 
         for (Integer specialtyId : request.getSpecialtyIds()) {
             Specialty specialty = specialtyRepository.findById(specialtyId)
@@ -118,7 +120,8 @@ public class DoctorServiceImpl implements DoctorService {
                 .firstName(doctor.getFirstName())
                 .lastName(doctor.getLastName())
                 .image(doctor.getImage() != null ? Base64.getEncoder().encodeToString(doctor.getImage()) : null)
-                .positionData(toAllCodeResponse(doctor.getPositionData()));
+                .positionData(toAllCodeResponse(doctor.getPositionData()))
+                .roleData(toAllCodeResponse(doctor.getRoleData()));
 
         // Markdown
         markdownRepository.findByDoctorId(doctorId).ifPresent(md ->
@@ -283,7 +286,8 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     @Transactional(readOnly = true)
     public List<Integer> getDoctorIdsByClinicId(int clinicId) {
-        return doctorClinicSpecialtyRepository.findDoctorIdsByClinicId(clinicId);
+        // Dùng DoctorInfos.clinicId thay vì DCS để không bỏ sót bác sĩ chưa chọn specialty
+        return doctorInfosRepository.findDoctorIdsByClinicId(clinicId);
     }
 
     @Override
@@ -313,7 +317,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     // ===== Helper methods =====
 
-    private DoctorListResponse toDoctorListResponse(User user) {
+    private DoctorListResponse toDoctorListResponse(User user, int count) {
         return DoctorListResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -322,7 +326,12 @@ public class DoctorServiceImpl implements DoctorService {
                 .image(user.getImage() != null ? Base64.getEncoder().encodeToString(user.getImage()) : null)
                 .positionData(toAllCodeResponse(user.getPositionData()))
                 .genderData(toAllCodeResponse(user.getGenderData()))
+                .count(count)
                 .build();
+    }
+
+    private DoctorListResponse toDoctorListResponse(User user) {
+        return toDoctorListResponse(user, 0);
     }
 
     private AllCodeResponse toAllCodeResponse(AllCode allCode) {

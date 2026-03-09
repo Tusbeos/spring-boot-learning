@@ -80,6 +80,8 @@ public class SecurityConfig {
                 .requestMatchers(PUBLIC_URLS).permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, PUBLIC_READ_URLS).permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/bookings/verify").permitAll()
+                // Đặt lịch không yêu cầu đăng nhập — bệnh nhân có thể đặt với tư cách khách
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/bookings").permitAll()
 
                 // Admin-only: user CRUD, create/update/delete specialty & clinic
                 .requestMatchers("/api/admin/**").hasRole(ROLE_ADMIN)
@@ -99,9 +101,6 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/doctors/{id}/info").hasAnyRole(ROLE_DOCTOR, ROLE_ADMIN)
                 .requestMatchers("/api/doctors/{id}/patients").hasAnyRole(ROLE_DOCTOR, ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/bookings/{id}/confirm").hasAnyRole(ROLE_DOCTOR, ROLE_ADMIN)
-
-                // Patient: book appointment
-                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/bookings").hasAnyRole(ROLE_PATIENT, ROLE_ADMIN)
 
                 // Còn lại: đã đăng nhập là được
                 .anyRequest().authenticated()
