@@ -1,0 +1,41 @@
+package com.emedicalbooking.dto.response;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+public class HistoryResponse {
+
+    private int id;
+
+    // Thông tin buổi khám (từ Booking)
+    private int bookingId;
+    private String bookingDate;        // booking.date (timestamp string từ FE)
+    private String timeType;           // keyMap của khung giờ
+    private String timeTypeValueVi;    // tên khung giờ tiếng Việt
+    private String timeTypeValueEn;
+
+    // Thông tin bác sĩ
+    private int doctorId;
+    private String doctorFirstName;
+    private String doctorLastName;
+
+    // Thông tin bệnh nhân
+    private int patientId;
+    private String patientFirstName;
+    private String patientLastName;
+    private String patientEmail;
+
+    // Lý do bệnh nhân đặt lịch
+    private String reason;
+
+    // Kết quả khám (do bác sĩ ghi)
+    private String diagnosis;
+    private String prescription;
+    private String notes;
+
+    private LocalDateTime createdAt;
+}

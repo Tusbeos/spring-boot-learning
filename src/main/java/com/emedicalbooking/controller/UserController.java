@@ -4,11 +4,15 @@ import com.emedicalbooking.dto.request.CreateUserRequest;
 import com.emedicalbooking.dto.request.UpdateUserRequest;
 import com.emedicalbooking.dto.response.ApiResponse;
 import com.emedicalbooking.dto.response.UserResponse;
+import com.emedicalbooking.entity.User;
+import com.emedicalbooking.repository.UserRepository;
 import com.emedicalbooking.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +23,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
@@ -41,7 +46,21 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updateUser(@PathVariable int id,
-                                                         @Valid @RequestBody UpdateUserRequest request) {
+                                                         @Valid @RequestBody UpdateUserRequest request,
+                                                         @AuthenticationPrincipal Jwt jwt) {
+        // Kiểm tra quyền: Admin (R1) có thể sửa bất kỳ user, còn lại chỉ được sửa chính mình
+        String email = jwt.getSubject();
+        User currentUser = userRepository.findByEmailWithRole(email).orElse(null);
+        boolean isAdmin = currentUser != null
+                && currentUser.getRoleData() != null
+                && "R1".equals(currentUser.getRoleData().getKeyMap());
+        if (!isAdmin && (currentUser == null || currentUser.getId() != id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.<Void>builder()
+                            .errCode(1)
+                            .errMessage("Bạn không có quyền cập nhật thông tin user khác")
+                            .build());
+        }
         userService.updateUser(id, request);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật user thành công", null));
     }

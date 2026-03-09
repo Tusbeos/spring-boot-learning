@@ -22,6 +22,9 @@ public class PatientBookingResponse {
     private PatientData patientData;
     private AllCodeResponse bookingTimeTypeData;
 
+    /** Dữ liệu bệnh nhân được đặt hộ (null nếu tự đặt cho mình) */
+    private ProfileData profileData;
+
     @Data
     @Builder
     @NoArgsConstructor
@@ -31,5 +34,21 @@ public class PatientBookingResponse {
         private String firstName;
         private String lastName;
         private String phoneNumber;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ProfileData {
+        private Integer id;
+        private String firstName;
+        private String lastName;
+        private String phoneNumber;
+        private String gender;
+        private String dateOfBirth;
+        private String address;
+        private String relationship;
+        private String medicalHistory;
     }
 }

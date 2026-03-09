@@ -294,24 +294,43 @@ public class DoctorServiceImpl implements DoctorService {
     @Transactional(readOnly = true)
     public List<PatientBookingResponse> getPatientsByDoctorAndDate(int doctorId, String date) {
         return bookingRepository.findByDoctorAndDate(doctorId, date).stream()
-                .map(b -> PatientBookingResponse.builder()
-                        .id(b.getId())
-                        .statusId(b.getStatusData() != null ? b.getStatusData().getKeyMap() : null)
-                        .doctorId(b.getDoctor().getId())
-                        .patientId(b.getPatient().getId())
-                        .date(b.getDate())
-                        .timeType(b.getTimeTypeData() != null ? b.getTimeTypeData().getKeyMap() : null)
-                        .token(b.getToken())
-                        .birthday(b.getBirthday())
-                        .reason(b.getReason())
-                        .patientData(PatientBookingResponse.PatientData.builder()
-                                .email(b.getPatient().getEmail())
-                                .firstName(b.getPatient().getFirstName())
-                                .lastName(b.getPatient().getLastName())
-                                .phoneNumber(b.getPatient().getPhoneNumber())
-                                .build())
-                        .bookingTimeTypeData(toAllCodeResponse(b.getTimeTypeData()))
-                        .build())
+                .map(b -> {
+                    // Map thông tin hồ sơ bệnh nhân được đặt hộ (nếu có)
+                    PatientBookingResponse.ProfileData profileData = null;
+                    if (b.getPatientProfile() != null) {
+                        var p = b.getPatientProfile();
+                        profileData = PatientBookingResponse.ProfileData.builder()
+                                .id(p.getId())
+                                .firstName(p.getFirstName())
+                                .lastName(p.getLastName())
+                                .phoneNumber(p.getPhoneNumber())
+                                .gender(p.getGender())
+                                .dateOfBirth(p.getDateOfBirth())
+                                .address(p.getAddress())
+                                .relationship(p.getRelationship())
+                                .medicalHistory(p.getMedicalHistory())
+                                .build();
+                    }
+                    return PatientBookingResponse.builder()
+                            .id(b.getId())
+                            .statusId(b.getStatusData() != null ? b.getStatusData().getKeyMap() : null)
+                            .doctorId(b.getDoctor().getId())
+                            .patientId(b.getPatient().getId())
+                            .date(b.getDate())
+                            .timeType(b.getTimeTypeData() != null ? b.getTimeTypeData().getKeyMap() : null)
+                            .token(b.getToken())
+                            .birthday(b.getBirthday())
+                            .reason(b.getReason())
+                            .patientData(PatientBookingResponse.PatientData.builder()
+                                    .email(b.getPatient().getEmail())
+                                    .firstName(b.getPatient().getFirstName())
+                                    .lastName(b.getPatient().getLastName())
+                                    .phoneNumber(b.getPatient().getPhoneNumber())
+                                    .build())
+                            .bookingTimeTypeData(toAllCodeResponse(b.getTimeTypeData()))
+                            .profileData(profileData)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

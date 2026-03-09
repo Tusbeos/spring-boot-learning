@@ -15,7 +15,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
            "LEFT JOIN FETCH b.doctor " +
            "LEFT JOIN FETCH b.patient " +
            "LEFT JOIN FETCH b.timeTypeData " +
-           "WHERE b.doctor.id = :doctorId AND b.date = :date AND b.statusData.keyMap = 'S2'")
+           "WHERE b.doctor.id = :doctorId AND b.date = :date " +
+           "AND b.statusData.keyMap IN ('S1', 'S2')")
     List<Booking> findByDoctorAndDate(@Param("doctorId") int doctorId, @Param("date") String date);
 
     @Query("SELECT b FROM Booking b WHERE b.patient.id = :patientId AND b.doctor.id = :doctorId " +

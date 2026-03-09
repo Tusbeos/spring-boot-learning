@@ -83,10 +83,10 @@ public class SecurityConfig {
                 // Đặt lịch không yêu cầu đăng nhập — bệnh nhân có thể đặt với tư cách khách
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/bookings").permitAll()
 
-                // Admin-only: user CRUD, create/update/delete specialty & clinic
+                // Admin CRUD users + bệnh nhân có thể tự cập nhật thông tin cá nhân
                 .requestMatchers("/api/admin/**").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/users").hasRole(ROLE_ADMIN)
-                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/{id}").hasRole(ROLE_ADMIN)
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/{id}").authenticated()
                 .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/users/{id}").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/specialties").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/specialties/{id}").hasRole(ROLE_ADMIN)
@@ -101,6 +101,13 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/doctors/{id}/info").hasAnyRole(ROLE_DOCTOR, ROLE_ADMIN)
                 .requestMatchers("/api/doctors/{id}/patients").hasAnyRole(ROLE_DOCTOR, ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/bookings/{id}/confirm").hasAnyRole(ROLE_DOCTOR, ROLE_ADMIN)
+
+                // Lịch sử khám: bác sĩ tạo/xem, admin xem tất cả, bệnh nhân xem của mình
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/histories").hasAnyRole(ROLE_DOCTOR, ROLE_ADMIN)
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/histories/**").authenticated()
+
+                // Hồ sơ bệnh nhân được đặt hộ: chỉ người đã đăng nhập mới được tạo/xem/xoá
+                .requestMatchers("/api/patient-profiles/**").authenticated()
 
                 // Còn lại: đã đăng nhập là được
                 .anyRequest().authenticated()

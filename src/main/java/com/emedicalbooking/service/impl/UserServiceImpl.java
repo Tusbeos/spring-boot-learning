@@ -91,8 +91,8 @@ public class UserServiceImpl implements UserService {
         user.setRoleData(findAllCode(request.getRoleId()));
         user.setPositionData(findAllCode(request.getPositionId()));
 
-        if (request.getAvatar() != null) {
-            user.setImage(Base64.getDecoder().decode(request.getAvatar()));
+        if (request.getImage() != null) {
+            user.setImage(Base64.getDecoder().decode(request.getImage()));
         }
 
         userRepository.save(user);

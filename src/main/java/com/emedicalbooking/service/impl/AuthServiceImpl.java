@@ -92,13 +92,17 @@ public class AuthServiceImpl implements AuthService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtTokenProvider.generateToken(userDetails);
 
+        // Load user with role to avoid LazyInitializationException
+        User userWithRole = userRepository.findByEmailWithRole(user.getEmail()).orElse(user);
+
         return AuthResponse.builder()
+                .id(user.getId())
                 .token(token)
                 .tokenType("Bearer")
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .roleId(user.getRoleData() != null ? user.getRoleData().getKeyMap() : null)
+                .roleId(userWithRole.getRoleData() != null ? userWithRole.getRoleData().getKeyMap() : null)
                 .build();
     }
 }

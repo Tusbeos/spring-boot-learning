@@ -5,10 +5,12 @@ import com.emedicalbooking.dto.request.ConfirmBookingRequest;
 import com.emedicalbooking.dto.request.VerifyBookingRequest;
 import com.emedicalbooking.entity.AllCode;
 import com.emedicalbooking.entity.Booking;
+import com.emedicalbooking.entity.PatientProfile;
 import com.emedicalbooking.entity.User;
 import com.emedicalbooking.exception.ResourceNotFoundException;
 import com.emedicalbooking.repository.AllCodeRepository;
 import com.emedicalbooking.repository.BookingRepository;
+import com.emedicalbooking.repository.PatientProfileRepository;
 import com.emedicalbooking.repository.UserRepository;
 import com.emedicalbooking.service.BookingService;
 import com.emedicalbooking.service.EmailService;
@@ -26,6 +28,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final AllCodeRepository allCodeRepository;
+    private final PatientProfileRepository patientProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
@@ -69,6 +72,24 @@ public class BookingServiceImpl implements BookingService {
                     .build();
             return bookingRepository.save(newBooking);
         });
+
+        // Nếu đặt hộ cho người khác, lưu PatientProfile và gắn vào booking
+        if (Boolean.TRUE.equals(request.getIsForOther())) {
+            PatientProfile profile = PatientProfile.builder()
+                    .user(patient)
+                    .firstName(request.getProfileFirstName())
+                    .lastName(request.getProfileLastName())
+                    .phoneNumber(request.getProfilePhoneNumber())
+                    .gender(request.getProfileGender())
+                    .dateOfBirth(request.getProfileDateOfBirth())
+                    .address(request.getProfileAddress())
+                    .relationship(request.getRelationship())
+                    .medicalHistory(request.getMedicalHistory())
+                    .build();
+            PatientProfile savedProfile = patientProfileRepository.save(profile);
+            booking.setPatientProfile(savedProfile);
+            bookingRepository.save(booking);
+        }
 
         // Gửi email xác nhận
         String patientName = request.getFullName() != null ? request.getFullName() :

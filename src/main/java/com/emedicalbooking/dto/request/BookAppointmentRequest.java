@@ -38,4 +38,32 @@ public class BookAppointmentRequest {
     private String address;
     private String birthday;
     private String reason;
+
+    // --- Đặt hộ cho người khác ---
+    /** true = đặt cho người khác, false hoặc null = đặt cho chính mình */
+    private Boolean isForOther;
+
+    /** Họ của bệnh nhân được đặt hộ */
+    private String profileFirstName;
+
+    /** Tên của bệnh nhân được đặt hộ */
+    private String profileLastName;
+
+    /** Số điện thoại của bệnh nhân được đặt hộ */
+    private String profilePhoneNumber;
+
+    /** Giới tính của bệnh nhân được đặt hộ */
+    private String profileGender;
+
+    /** Ngày sinh của bệnh nhân được đặt hộ */
+    private String profileDateOfBirth;
+
+    /** Địa chỉ của bệnh nhân được đặt hộ */
+    private String profileAddress;
+
+    /** Mối quan hệ: cha, mẹ, con, vợ, chồng... */
+    private String relationship;
+
+    /** Tiền sử bệnh của bệnh nhân được đặt hộ */
+    private String medicalHistory;
 }
