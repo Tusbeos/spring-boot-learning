@@ -1,0 +1,27 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: e-medical-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: e_medical_booking
+    ports:
+      - "3306:3306" # host:container — truy cập từ máy thật qua cổng 3306
+    volumes:
+      - mysql_data:/var/lib/mysql # lưu data vào volume, không mất khi restart
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: e-medical-phpmyadmin
+    restart: always
+    depends_on:
+      - mysql # chờ mysql khởi động trước
+    environment:
+      PMA_HOST: mysql # tên service mysql bên trên
+      PMA_PORT: 3306
+    ports:
+      - "8080:80" # truy cập phpMyAdmin tại http://localhost:8080
+
+volumes:
+  mysql_data: # volume để giữ data MySQL

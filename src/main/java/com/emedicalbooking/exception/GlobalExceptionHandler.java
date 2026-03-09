@@ -1,0 +1,112 @@
+package com.emedicalbooking.exception;
+
+import com.emedicalbooking.dto.response.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Tổng đài xử lý lỗi toàn cục.
+ *
+ * @RestControllerAdvice: áp dụng cho tất cả @RestController trong project.
+ * Khi bất kỳ Controller nào throw exception → class này tự động bắt và trả về JSON.
+ *
+ * Không cần try/catch trong Controller hay Service, cứ "throw" là class này lo.
+ */
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    /**
+     * Bắt lỗi 404 - Không tìm thấy resource.
+     * Ví dụ: GET /api/doctors/999 → Doctor không tồn tại
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(ResourceNotFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * Bắt lỗi 409 - Email bị trùng khi đăng ký.
+     * Ví dụ: POST /api/auth/register với email đã tồn tại
+     */
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDuplicateEmail(DuplicateEmailException ex) {
+        log.warn("Duplicate email: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * Bắt lỗi 403 - Không có quyền.
+     * Ví dụ: bệnh nhân xóa booking của người khác
+     */
+    /**
+     * Bắt lỗi 401 - Sai username/password khi đăng nhập.
+     * Spring Security throw BadCredentialsException khi login thất bại
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBadCredentials(BadCredentialsException ex) {
+        log.warn("Bad credentials attempt");
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Email hoặc mật khẩu không chính xác"));
+    }
+
+    /**
+     * Bắt lỗi validate input - khi dữ liệu request không hợp lệ.
+     *
+     * Ví dụ: gửi POST /api/auth/register với body:
+     *   { "email": "không-phải-email", "password": "" }
+     *
+     * @Valid trong Controller sẽ trigger exception này trước khi vào Service.
+     * Trả về map lỗi theo từng field:
+     *   { "email": "Email không hợp lệ", "password": "Mật khẩu không được trống" }
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidation(
+            MethodArgumentNotValidException ex) {
+
+        // Thu thập tất cả lỗi validation theo từng field
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        log.warn("Validation failed: {}", errors);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.<Map<String, String>>builder()
+                        .success(false)
+                        .message("Dữ liệu không hợp lệ")
+                        .data(errors)
+                        .build());
+    }
+
+    /**
+     * Bắt tất cả lỗi còn lại không được xử lý ở trên.
+     * Đây là "lưới an toàn" cuối cùng - trả về 500 Internal Server Error.
+     * Log đầy đủ để debug, nhưng KHÔNG lộ stacktrace ra ngoài.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleGeneral(Exception ex) {
+        log.error("Unexpected error: ", ex);  // log đầy đủ để developer xem
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Đã xảy ra lỗi hệ thống, vui lòng thử lại sau"));
+    }
+}

@@ -1,0 +1,41 @@
+package com.emedicalbooking.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+@Data
+public class BookAppointmentRequest {
+
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không hợp lệ")
+    private String email;
+
+    @NotNull(message = "doctorId không được để trống")
+    private Integer doctorId;
+
+    @NotBlank(message = "date không được để trống")
+    private String date;
+
+    @NotBlank(message = "timeType không được để trống")
+    private String timeType;
+
+    @NotBlank(message = "timeString không được để trống")
+    private String timeString;
+
+    @NotBlank(message = "doctorName không được để trống")
+    private String doctorName;
+
+    @NotBlank(message = "language không được để trống")
+    private String language;
+
+    private String fullName;
+    private String firstName;
+    private String lastName;
+    private String gender;
+    private String phoneNumber;
+    private String address;
+    private String birthday;
+    private String reason;
+}

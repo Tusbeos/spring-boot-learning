@@ -1,0 +1,58 @@
+spring:
+  # ==================== DATABASE ====================
+  # Cấu hình kết nối MySQL
+  datasource:
+    url: jdbc:mysql://localhost:3306/e_medical_booking?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
+    username: root
+    password: root # ← Thay bằng password MySQL của bạn
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # ==================== JPA / HIBERNATE ====================
+  jpa:
+    hibernate:
+      # update = tự động thêm bảng/cột mới, không xóa data cũ
+      ddl-auto: update
+    properties:
+      hibernate:
+        # KHÔNG chỉ định dialect: Hibernate 6 (Spring Boot 3.x) tự detect từ JDBC URL
+        # Điều này cho phép test dùng H2 vẫn hoạt động bình thường
+        # In SQL ra console để debug (tắt khi deploy production)
+        show_sql: true
+        format_sql: true
+    # Không muốn thấy SQL thì đổi show-sql: false
+    show-sql: true
+    open-in-view: false # Tắt để tránh lỗi "N+1 query" không kiểm soát được
+
+  # ==================== MAIL ====================
+  # Dùng Gmail SMTP để gửi email (xác nhận đặt lịch, quên mật khẩu...)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: biconghi123@gmail.com
+    password: plyj tqsu jgzt clam
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true # Bật mã hóa TLS khi gửi mail
+
+# ==================== JWT ====================
+# Cấu hình riêng (không phải của Spring) - JwtTokenProvider đọc 2 giá trị này
+app:
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+
+    expiration-ms: 86400000 # /24h
+
+# ==================== SERVER ====================
+server:
+  port: 8888
+
+# ==================== LOGGING ====================
+logging:
+  level:
+    # Xem log của Spring Security để debug lỗi 401/403
+    org.springframework.security: DEBUG
+    # Tắt log thừa của Hibernate
+    org.hibernate.SQL: DEBUG
