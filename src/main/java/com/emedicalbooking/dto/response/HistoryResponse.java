@@ -3,6 +3,7 @@ package com.emedicalbooking.dto.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -36,6 +37,13 @@ public class HistoryResponse {
     private String diagnosis;
     private String prescription;
     private String notes;
+    private LocalDate examinationDate;
+
+    // Thông tin người được đặt hộ (nếu đặt cho người thân, ngược lại null)
+    private Integer profileId;
+    private String profileFirstName;
+    private String profileLastName;
+    private String profileRelationship;
 
     private LocalDateTime createdAt;
 }

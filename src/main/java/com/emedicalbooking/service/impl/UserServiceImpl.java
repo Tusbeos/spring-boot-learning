@@ -1,5 +1,6 @@
 package com.emedicalbooking.service.impl;
 
+import com.emedicalbooking.dto.request.ChangePasswordRequest;
 import com.emedicalbooking.dto.request.CreateUserRequest;
 import com.emedicalbooking.dto.request.UpdateUserRequest;
 import com.emedicalbooking.dto.response.UserResponse;
@@ -111,5 +112,30 @@ public class UserServiceImpl implements UserService {
                 .filter(a -> a.getKeyMap().equals(keyMap))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", keyMap));
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(int userId, ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        // Kiểm tra mật khẩu cũ có đúng không
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu cũ không chính xác");
+        }
+
+        // Kiểm tra mật khẩu mới và xác nhận có khớp không
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("Mật khẩu mới và xác nhận mật khẩu không khớp");
+        }
+
+        // Kiểm tra mật khẩu mới không trùng mật khẩu cũ
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu mới không được trùng với mật khẩu cũ");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

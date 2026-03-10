@@ -1,5 +1,6 @@
 package com.emedicalbooking.service;
 
+import com.emedicalbooking.dto.request.ChangePasswordRequest;
 import com.emedicalbooking.dto.request.CreateUserRequest;
 import com.emedicalbooking.dto.request.UpdateUserRequest;
 import com.emedicalbooking.dto.response.UserResponse;
@@ -17,4 +18,6 @@ public interface UserService {
     void updateUser(int id, UpdateUserRequest request);
 
     void deleteUser(int id);
+
+    void changePassword(int userId, ChangePasswordRequest request);
 }

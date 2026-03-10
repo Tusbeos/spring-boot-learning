@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface MarkdownRepository extends JpaRepository<Markdown, Integer> {
 
-    Optional<Markdown> findByDoctorId(int doctorId);
+    Optional<Markdown> findFirstByDoctorId(int doctorId);
 }

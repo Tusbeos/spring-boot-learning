@@ -16,6 +16,7 @@ public interface HistoryRepository extends JpaRepository<History, Integer> {
            "JOIN FETCH b.patient " +
            "JOIN FETCH b.doctor " +
            "LEFT JOIN FETCH b.timeTypeData " +
+           "LEFT JOIN FETCH b.patientProfile " +
            "WHERE b.patient.id = :patientId " +
            "ORDER BY h.createdAt DESC")
     List<History> findByPatientId(@Param("patientId") int patientId);

@@ -1,5 +1,6 @@
 package com.emedicalbooking.controller;
 
+import com.emedicalbooking.dto.request.ChangePasswordRequest;
 import com.emedicalbooking.dto.request.CreateUserRequest;
 import com.emedicalbooking.dto.request.UpdateUserRequest;
 import com.emedicalbooking.dto.response.ApiResponse;
@@ -69,5 +70,23 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa user thành công", null));
+    }
+
+    @PutMapping("/{id}/change-password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(@PathVariable int id,
+                                                             @Valid @RequestBody ChangePasswordRequest request,
+                                                             @AuthenticationPrincipal Jwt jwt) {
+        // Chỉ cho phép user đổi mật khẩu của chính mình
+        String email = jwt.getSubject();
+        User currentUser = userRepository.findByEmailWithRole(email).orElse(null);
+        if (currentUser == null || currentUser.getId() != id) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.<Void>builder()
+                            .errCode(1)
+                            .errMessage("Bạn chỉ có thể đổi mật khẩu cho chính mình")
+                            .build());
+        }
+        userService.changePassword(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công", null));
     }
 }

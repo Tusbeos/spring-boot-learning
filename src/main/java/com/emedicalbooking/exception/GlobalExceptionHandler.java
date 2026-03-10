@@ -98,6 +98,43 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Bắt lỗi IllegalArgumentException - dữ liệu đầu vào không hợp lệ ở tầng business logic.
+     * Ví dụ: mật khẩu cũ không đúng, mật khẩu mới không khớp xác nhận
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("Illegal argument: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * Bắt lỗi IllegalStateException - trạng thái không hợp lệ.
+     * Ví dụ: khung giờ đã đầy, không thể đặt thêm
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalState(IllegalStateException ex) {
+        log.warn("Illegal state: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * Bắt lỗi OptimisticLockException - xử lý race condition khi 2 người đặt cùng slot cuối.
+     * @Version trên Schedule entity sẽ throw exception này khi 2 transaction cùng sửa 1 record.
+     */
+    @ExceptionHandler(org.springframework.orm.ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ApiResponse<Void>> handleOptimisticLock(
+            org.springframework.orm.ObjectOptimisticLockingFailureException ex) {
+        log.warn("Optimistic locking conflict: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("Có người khác vừa đặt slot này, vui lòng thử lại"));
+    }
+
+    /**
      * Bắt tất cả lỗi còn lại không được xử lý ở trên.
      * Đây là "lưới an toàn" cuối cùng - trả về 500 Internal Server Error.
      * Log đầy đủ để debug, nhưng KHÔNG lộ stacktrace ra ngoài.

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +36,11 @@ public class HistoryServiceImpl implements HistoryService {
         history.setDiagnosis(request.getDiagnosis());
         history.setPrescription(request.getPrescription());
         history.setNotes(request.getNotes());
+        history.setExaminationDate(
+            request.getExaminationDate() != null
+                ? request.getExaminationDate()
+                : java.time.LocalDate.now()
+        );
 
         return toResponse(historyRepository.save(history));
     }
@@ -57,6 +63,13 @@ public class HistoryServiceImpl implements HistoryService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<HistoryResponse> getHistoryByBooking(int bookingId) {
+        return historyRepository.findByBookingId(bookingId)
+                .map(this::toResponse);
+    }
+
     // Chuyển History entity → HistoryResponse DTO
     private HistoryResponse toResponse(History h) {
         Booking b = h.getBooking();
@@ -68,6 +81,7 @@ public class HistoryServiceImpl implements HistoryService {
                 .diagnosis(h.getDiagnosis())
                 .prescription(h.getPrescription())
                 .notes(h.getNotes())
+                .examinationDate(h.getExaminationDate())
                 .createdAt(h.getCreatedAt());
 
         if (b.getTimeTypeData() != null) {
@@ -85,6 +99,14 @@ public class HistoryServiceImpl implements HistoryService {
                    .patientFirstName(b.getPatient().getFirstName())
                    .patientLastName(b.getPatient().getLastName())
                    .patientEmail(b.getPatient().getEmail());
+        }
+        // Nếu booking đặt cho người thân thì đính kèm thông tin profile
+        if (b.getPatientProfile() != null) {
+            var p = b.getPatientProfile();
+            builder.profileId(p.getId())
+                   .profileFirstName(p.getFirstName())
+                   .profileLastName(p.getLastName())
+                   .profileRelationship(p.getRelationship());
         }
         return builder.build();
     }

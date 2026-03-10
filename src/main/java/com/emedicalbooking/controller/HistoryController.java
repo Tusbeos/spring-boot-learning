@@ -53,4 +53,15 @@ public class HistoryController {
         List<HistoryResponse> list = historyService.getHistoryByDoctor(doctorId);
         return ResponseEntity.ok(ApiResponse.success(null, list));
     }
+
+    /**
+     * GET /api/histories/booking/{bookingId}
+     * Lấy hồ sơ khám của 1 lịch hẹn cụ thể (dùng để pre-fill form kê đơn).
+     */
+    @GetMapping("/booking/{bookingId}")
+    public ResponseEntity<ApiResponse<HistoryResponse>> getByBooking(
+            @PathVariable int bookingId) {
+        HistoryResponse data = historyService.getHistoryByBooking(bookingId).orElse(null);
+        return ResponseEntity.ok(ApiResponse.success(null, data));
+    }
 }

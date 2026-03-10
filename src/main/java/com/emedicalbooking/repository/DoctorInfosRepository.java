@@ -10,14 +10,14 @@ import java.util.Optional;
 
 public interface DoctorInfosRepository extends JpaRepository<DoctorInfos, Integer> {
 
-    @Query("SELECT d FROM DoctorInfos d " +
+    @Query("SELECT DISTINCT d FROM DoctorInfos d " +
            "LEFT JOIN FETCH d.priceData " +
            "LEFT JOIN FETCH d.provinceData " +
            "LEFT JOIN FETCH d.paymentData " +
            "WHERE d.doctor.id = :doctorId")
-    Optional<DoctorInfos> findByDoctorIdWithRelations(@Param("doctorId") int doctorId);
+    List<DoctorInfos> findByDoctorIdWithRelations(@Param("doctorId") int doctorId);
 
-    Optional<DoctorInfos> findByDoctorId(@Param("doctorId") int doctorId);
+    Optional<DoctorInfos> findFirstByDoctorId(int doctorId);
 
     // Trả về danh sách doctorId theo clinicId (dùng cho trang chi tiết clinic)
     @Query("SELECT di.doctor.id FROM DoctorInfos di WHERE di.clinic.id = :clinicId")

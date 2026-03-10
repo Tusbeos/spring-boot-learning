@@ -67,7 +67,7 @@ public class DoctorServiceImpl implements DoctorService {
                     .build();
             markdownRepository.save(markdown);
         } else {
-            Markdown markdown = markdownRepository.findByDoctorId(doctorId)
+            Markdown markdown = markdownRepository.findFirstByDoctorId(doctorId)
                     .orElseThrow(() -> new ResourceNotFoundException("Markdown", "doctorId", doctorId));
             markdown.setContentHTML(request.getContentHTML());
             markdown.setContentMarkdown(request.getContentMarkdown());
@@ -76,7 +76,7 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         // Upsert DoctorInfos
-        DoctorInfos doctorInfo = doctorInfosRepository.findByDoctorId(doctorId)
+        DoctorInfos doctorInfo = doctorInfosRepository.findFirstByDoctorId(doctorId)
                 .orElse(DoctorInfos.builder().doctor(doctor).build());
 
         doctorInfo.setNameClinic(request.getNameClinic());
@@ -124,7 +124,7 @@ public class DoctorServiceImpl implements DoctorService {
                 .roleData(toAllCodeResponse(doctor.getRoleData()));
 
         // Markdown
-        markdownRepository.findByDoctorId(doctorId).ifPresent(md ->
+        markdownRepository.findFirstByDoctorId(doctorId).ifPresent(md ->
                 builder.markdown(DoctorDetailResponse.MarkdownData.builder()
                         .description(md.getDescription())
                         .contentHTML(md.getContentHTML())
@@ -132,7 +132,7 @@ public class DoctorServiceImpl implements DoctorService {
                         .build()));
 
         // DoctorInfo
-        doctorInfosRepository.findByDoctorIdWithRelations(doctorId).ifPresent(info -> {
+        doctorInfosRepository.findByDoctorIdWithRelations(doctorId).stream().findFirst().ifPresent(info -> {
             List<Integer> specialtyIds = doctorClinicSpecialtyRepository.findSpecialtyIdsByDoctorId(doctorId);
             builder.doctorInfo(DoctorDetailResponse.DoctorInfoData.builder()
                     .priceId(info.getPriceData() != null ? info.getPriceData().getKeyMap() : null)
@@ -252,6 +252,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Transactional(readOnly = true)
     public DoctorExtraInfoResponse getExtraInfo(int doctorId) {
         DoctorInfos info = doctorInfosRepository.findByDoctorIdWithRelations(doctorId)
+                .stream().findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("DoctorInfo", "doctorId", doctorId));
 
         return DoctorExtraInfoResponse.builder()
@@ -286,8 +287,12 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     @Transactional(readOnly = true)
     public List<Integer> getDoctorIdsByClinicId(int clinicId) {
-        // Dùng DoctorInfos.clinicId thay vì DCS để không bỏ sót bác sĩ chưa chọn specialty
-        return doctorInfosRepository.findDoctorIdsByClinicId(clinicId);
+        // Gộp từ 2 nguồn để không bỏ sót bác sĩ nào:
+        // 1. DoctorInfos.clinicId – bác sĩ đã chọn cơ sở y tế này
+        // 2. DoctorClinicSpecialty.clinicId – bác sĩ được gán chuyên khoa tại cơ sở này
+        Set<Integer> result = new LinkedHashSet<>(doctorInfosRepository.findDoctorIdsByClinicId(clinicId));
+        result.addAll(doctorClinicSpecialtyRepository.findDoctorIdsByClinicId(clinicId));
+        return new ArrayList<>(result);
     }
 
     @Override

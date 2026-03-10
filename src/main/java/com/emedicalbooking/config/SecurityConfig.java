@@ -87,6 +87,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/users").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/{id}").authenticated()
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/{id}/change-password").authenticated()
                 .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/users/{id}").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/specialties").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/specialties/{id}").hasRole(ROLE_ADMIN)

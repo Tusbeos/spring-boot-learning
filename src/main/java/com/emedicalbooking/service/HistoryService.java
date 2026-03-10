@@ -4,6 +4,7 @@ import com.emedicalbooking.dto.request.CreateHistoryRequest;
 import com.emedicalbooking.dto.response.HistoryResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface HistoryService {
 
@@ -15,4 +16,7 @@ public interface HistoryService {
 
     /** Lấy toàn bộ lịch sử khám do 1 bác sĩ thực hiện */
     List<HistoryResponse> getHistoryByDoctor(int doctorId);
+
+    /** Lấy hồ sơ khám của 1 booking cụ thể (dùng để pre-fill form kê đơn) */
+    Optional<HistoryResponse> getHistoryByBooking(int bookingId);
 }

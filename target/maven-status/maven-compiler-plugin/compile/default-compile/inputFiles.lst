@@ -57,6 +57,7 @@ D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\dto\response
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\dto\response\UserResponse.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\entity\Booking.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\repository\DoctorServiceRepository.java
+D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\dto\request\ChangePasswordRequest.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\service\PatientProfileService.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\dto\response\AllCodeResponse.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\dto\request\BulkCreateScheduleRequest.java

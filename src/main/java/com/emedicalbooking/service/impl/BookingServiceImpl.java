@@ -6,11 +6,13 @@ import com.emedicalbooking.dto.request.VerifyBookingRequest;
 import com.emedicalbooking.entity.AllCode;
 import com.emedicalbooking.entity.Booking;
 import com.emedicalbooking.entity.PatientProfile;
+import com.emedicalbooking.entity.Schedule;
 import com.emedicalbooking.entity.User;
 import com.emedicalbooking.exception.ResourceNotFoundException;
 import com.emedicalbooking.repository.AllCodeRepository;
 import com.emedicalbooking.repository.BookingRepository;
 import com.emedicalbooking.repository.PatientProfileRepository;
+import com.emedicalbooking.repository.ScheduleRepository;
 import com.emedicalbooking.repository.UserRepository;
 import com.emedicalbooking.service.BookingService;
 import com.emedicalbooking.service.EmailService;
@@ -29,6 +31,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final AllCodeRepository allCodeRepository;
     private final PatientProfileRepository patientProfileRepository;
+    private final ScheduleRepository scheduleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
@@ -54,24 +57,38 @@ public class BookingServiceImpl implements BookingService {
                     return userRepository.save(newUser);
                 });
 
-        // findOrCreate booking
+        // Luôn tạo booking MỚI — không kiểm tra booking cũ (1 email có thể đặt nhiều lần
+        // cho cùng khung giờ: đặt cho bản thân, đặt hộ người thân, v.v.)
+
+        // Kiểm tra lịch khám tồn tại và còn slot
+        Schedule schedule = scheduleRepository.findByDoctorIdAndDateAndTimeType(
+                request.getDoctorId(), request.getDate(), request.getTimeType()
+        ).orElseThrow(() -> new ResourceNotFoundException(
+                "Không tìm thấy lịch khám cho bác sĩ này vào thời gian đã chọn"));
+
+        if (schedule.getCurrentNumber() >= schedule.getMaxNumber()) {
+            throw new IllegalStateException("Khung giờ này đã đầy, vui lòng chọn khung giờ khác");
+        }
+
+        // Tăng currentNumber bằng UPDATE nguyên tử — an toàn với race condition
+        int updated = scheduleRepository.incrementCurrentNumber(schedule.getId());
+        if (updated == 0) {
+            throw new IllegalStateException("Khung giờ này đã đầy, vui lòng chọn khung giờ khác");
+        }
+
         String token = UUID.randomUUID().toString();
-        Booking booking = bookingRepository.findByPatientAndDoctorAndDateAndTimeType(
-                patient.getId(), request.getDoctorId(), request.getDate(), request.getTimeType()
-        ).orElseGet(() -> {
-            Booking newBooking = Booking.builder()
-                    .patient(patient)
-                    .doctor(userRepository.findById(request.getDoctorId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", request.getDoctorId())))
-                    .date(request.getDate())
-                    .timeTypeData(findAllCode(request.getTimeType()))
-                    .statusData(findAllCode("S1"))
-                    .token(token)
-                    .birthday(request.getBirthday())
-                    .reason(request.getReason())
-                    .build();
-            return bookingRepository.save(newBooking);
-        });
+        Booking booking = Booking.builder()
+                .patient(patient)
+                .doctor(userRepository.findById(request.getDoctorId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", request.getDoctorId())))
+                .date(request.getDate())
+                .timeTypeData(findAllCode(request.getTimeType()))
+                .statusData(findAllCode("S1"))
+                .token(token)
+                .birthday(request.getBirthday())
+                .reason(request.getReason())
+                .build();
+        booking = bookingRepository.save(booking);
 
         // Nếu đặt hộ cho người khác, lưu PatientProfile và gắn vào booking
         if (Boolean.TRUE.equals(request.getIsForOther())) {
