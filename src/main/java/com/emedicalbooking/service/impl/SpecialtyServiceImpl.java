@@ -30,7 +30,7 @@ public class SpecialtyServiceImpl implements SpecialtyService {
                 .name(request.getName())
                 .descriptionHTML(request.getDescriptionHTML())
                 .descriptionMarkdown(request.getDescriptionMarkdown())
-                .image(Base64.getDecoder().decode(request.getImageBase64()))
+                .image(decodeBase64Image(request.getImageBase64()))
                 .build();
         specialtyRepository.save(specialty);
     }
@@ -63,9 +63,17 @@ public class SpecialtyServiceImpl implements SpecialtyService {
         if (request.getName() != null) specialty.setName(request.getName());
         if (request.getDescriptionHTML() != null) specialty.setDescriptionHTML(request.getDescriptionHTML());
         if (request.getDescriptionMarkdown() != null) specialty.setDescriptionMarkdown(request.getDescriptionMarkdown());
-        if (request.getImageBase64() != null) specialty.setImage(Base64.getDecoder().decode(request.getImageBase64()));
+        if (request.getImageBase64() != null) specialty.setImage(decodeBase64Image(request.getImageBase64()));
 
         specialtyRepository.save(specialty);
+    }
+
+    /** Xử lý cả 2 dạng: chuỗi base64 thuần và data URI (data:image/...;base64,...) */
+    private byte[] decodeBase64Image(String imageBase64) {
+        String pure = imageBase64.contains(",")
+                ? imageBase64.substring(imageBase64.indexOf(',') + 1)
+                : imageBase64;
+        return Base64.getDecoder().decode(pure.trim());
     }
 
     @Override

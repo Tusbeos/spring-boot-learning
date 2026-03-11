@@ -39,16 +39,15 @@ public class Booking {
 
     private String token;
 
+    private LocalDateTime tokenExpiry;
+
     private String birthday;
 
     @Lob
     @Column(columnDefinition = "TEXT")
     private String reason;
 
-    /**
-     * Khi đặt cho người khác: tham chiếu đến PatientProfile (nullable).
-     * Nếu null → bệnh nhân chính là account holder (patient field).
-     */
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_profile_id", nullable = true)
     private PatientProfile patientProfile;

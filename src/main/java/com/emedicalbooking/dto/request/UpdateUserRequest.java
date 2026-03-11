@@ -20,5 +20,5 @@ public class UpdateUserRequest {
     @NotBlank(message = "PositionId không được để trống")
     private String positionId;
 
-    private String image; // base64
+    private String avatar; // base64
 }

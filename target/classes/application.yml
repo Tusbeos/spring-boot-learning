@@ -42,8 +42,13 @@ spring:
 app:
   jwt:
     secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    expiration-ms: 86400000 # 24h
 
-    expiration-ms: 86400000 # /24h
+  booking:
+    # AES-256 key dùng mã hoá token gửi qua email (tối thiểu 32 ký tự)
+    token-secret: eMedBook@2026#SecretKey!AES256OK
+    # Thời gian hiệu lực của token xác nhận đặt lịch (phút)
+    token-expiry-minutes: 5
 
 # ==================== SERVER ====================
 server:

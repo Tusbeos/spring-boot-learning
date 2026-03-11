@@ -5,22 +5,27 @@ import com.emedicalbooking.dto.request.ConfirmBookingRequest;
 import com.emedicalbooking.dto.request.VerifyBookingRequest;
 import com.emedicalbooking.entity.AllCode;
 import com.emedicalbooking.entity.Booking;
+import com.emedicalbooking.entity.DoctorInfos;
 import com.emedicalbooking.entity.PatientProfile;
 import com.emedicalbooking.entity.Schedule;
 import com.emedicalbooking.entity.User;
 import com.emedicalbooking.exception.ResourceNotFoundException;
 import com.emedicalbooking.repository.AllCodeRepository;
 import com.emedicalbooking.repository.BookingRepository;
+import com.emedicalbooking.repository.DoctorInfosRepository;
 import com.emedicalbooking.repository.PatientProfileRepository;
 import com.emedicalbooking.repository.ScheduleRepository;
 import com.emedicalbooking.repository.UserRepository;
+import com.emedicalbooking.security.TokenEncryptionUtils;
 import com.emedicalbooking.service.BookingService;
 import com.emedicalbooking.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -34,11 +39,15 @@ public class BookingServiceImpl implements BookingService {
     private final ScheduleRepository scheduleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final TokenEncryptionUtils tokenEncryptionUtils;
+    private final DoctorInfosRepository doctorInfosRepository;
+
+    @Value("${app.booking.token-expiry-minutes:5}")
+    private int tokenExpiryMinutes;
 
     @Override
     @Transactional
     public void bookAppointment(BookAppointmentRequest request) {
-        // findOrCreate patient by email
         User patient = userRepository.findByEmail(request.getEmail())
                 .orElseGet(() -> {
                     User newUser = User.builder()
@@ -56,10 +65,6 @@ public class BookingServiceImpl implements BookingService {
                     }
                     return userRepository.save(newUser);
                 });
-
-        // Luôn tạo booking MỚI — không kiểm tra booking cũ (1 email có thể đặt nhiều lần
-        // cho cùng khung giờ: đặt cho bản thân, đặt hộ người thân, v.v.)
-
         // Kiểm tra lịch khám tồn tại và còn slot
         Schedule schedule = scheduleRepository.findByDoctorIdAndDateAndTimeType(
                 request.getDoctorId(), request.getDate(), request.getTimeType()
@@ -85,6 +90,7 @@ public class BookingServiceImpl implements BookingService {
                 .timeTypeData(findAllCode(request.getTimeType()))
                 .statusData(findAllCode("S1"))
                 .token(token)
+                .tokenExpiry(LocalDateTime.now().plusMinutes(tokenExpiryMinutes))
                 .birthday(request.getBirthday())
                 .reason(request.getReason())
                 .build();
@@ -112,13 +118,16 @@ public class BookingServiceImpl implements BookingService {
         String patientName = request.getFullName() != null ? request.getFullName() :
                 (request.getFirstName() + " " + (request.getLastName() != null ? request.getLastName() : "")).trim();
 
+        // Token gửi qua email được mã hoá — người dùng không đọc được. Token thô lưu trong DB.
+        String encryptedToken = tokenEncryptionUtils.encrypt(booking.getToken());
+
         emailService.sendBookingConfirmationEmail(
                 request.getEmail(),
                 patientName,
                 request.getDoctorName(),
                 request.getTimeString(),
                 request.getLanguage(),
-                booking.getToken(),
+                encryptedToken,
                 request.getDoctorId()
         );
     }
@@ -126,8 +135,26 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public void verifyBooking(VerifyBookingRequest request) {
-        Booking booking = bookingRepository.findByTokenAndDoctorId(request.getToken(), request.getDoctorId())
+        // Giải mã token từ URL email → token thô lưu trong DB
+        String rawToken;
+        try {
+            rawToken = tokenEncryptionUtils.decrypt(request.getToken());
+        } catch (IllegalArgumentException e) {
+            throw new ResourceNotFoundException("Token không hợp lệ hoặc đã bị giả mạo");
+        }
+
+        Booking booking = bookingRepository.findByTokenAndDoctorId(rawToken, request.getDoctorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Booking không tồn tại hoặc đã được xác nhận"));
+
+        // Kiểm tra token hết hạn
+        if (booking.getTokenExpiry() != null && LocalDateTime.now().isAfter(booking.getTokenExpiry())) {
+            // Giảm slot và xoá booking hết hạn
+            scheduleRepository.findByDoctorIdAndDateAndTimeType(
+                    booking.getDoctor().getId(), booking.getDate(), booking.getTimeTypeData().getKeyMap()
+            ).ifPresent(s -> scheduleRepository.decrementCurrentNumber(s.getId()));
+            bookingRepository.delete(booking);
+            throw new IllegalStateException("Link xác nhận đặt lịch đã hết hạn (" + tokenExpiryMinutes + " phút). Vui lòng đặt lịch lại.");
+        }
 
         booking.setStatusData(findAllCode("S2"));
         bookingRepository.save(booking);
@@ -146,6 +173,15 @@ public class BookingServiceImpl implements BookingService {
         String statusId = request.getStatusId() != null ? request.getStatusId() : "S3";
         booking.setStatusData(findAllCode(statusId));
         bookingRepository.save(booking);
+
+        // Tăng count khi bác sĩ xác nhận khám (status S3 = confirmed)
+        if ("S3".equals(statusId)) {
+            doctorInfosRepository.findFirstByDoctorId(booking.getDoctor().getId())
+                    .ifPresent(info -> {
+                        info.setCount(info.getCount() + 1);
+                        doctorInfosRepository.save(info);
+                    });
+        }
     }
 
     private AllCode findAllCode(String keyMap) {

@@ -30,4 +30,11 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.statusData WHERE b.token = :token AND b.doctor.id = :doctorId AND b.statusData.keyMap = 'S1'")
     Optional<Booking> findByTokenAndDoctorId(@Param("token") String token, @Param("doctorId") int doctorId);
+
+    /** Lấy tất cả lịch hẽn S1 đã quá thời gian xác nhận — dùng cho scheduled cleanup */
+    @Query("SELECT b FROM Booking b " +
+           "LEFT JOIN FETCH b.timeTypeData " +
+           "LEFT JOIN FETCH b.doctor " +
+           "WHERE b.statusData.keyMap = 'S1' AND b.tokenExpiry < :now")
+    List<Booking> findExpiredUnconfirmedBookings(@Param("now") java.time.LocalDateTime now);
 }

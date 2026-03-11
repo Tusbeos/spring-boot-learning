@@ -34,6 +34,7 @@ com\emedicalbooking\dto\response\AllCodeResponse.class
 com\emedicalbooking\dto\request\LoginRequest.class
 com\emedicalbooking\repository\HistoryRepository.class
 com\emedicalbooking\entity\Markdown.class
+com\emedicalbooking\service\impl\BookingCleanupScheduler.class
 com\emedicalbooking\config\SwaggerConfig.class
 com\emedicalbooking\repository\UserRepository.class
 com\emedicalbooking\entity\User$UserBuilder.class
@@ -49,6 +50,7 @@ com\emedicalbooking\controller\UserController.class
 com\emedicalbooking\dto\response\SpecialtyResponse.class
 com\emedicalbooking\dto\response\SpecialtyResponse$SpecialtyResponseBuilder.class
 com\emedicalbooking\service\impl\HistoryServiceImpl.class
+com\emedicalbooking\dto\request\ChangePasswordRequest.class
 com\emedicalbooking\dto\response\UserResponse.class
 com\emedicalbooking\dto\request\UpdateClinicRequest.class
 com\emedicalbooking\service\PatientProfileService.class
@@ -69,6 +71,7 @@ com\emedicalbooking\service\DoctorService.class
 com\emedicalbooking\entity\Schedule.class
 com\emedicalbooking\dto\request\BulkCreateScheduleRequest$ScheduleItem.class
 com\emedicalbooking\config\SecurityConfig.class
+com\emedicalbooking\security\TokenEncryptionUtils.class
 com\emedicalbooking\entity\DoctorService.class
 com\emedicalbooking\entity\Clinic$ClinicBuilder.class
 com\emedicalbooking\dto\request\BookAppointmentRequest.class
@@ -86,6 +89,7 @@ com\emedicalbooking\entity\Specialty$SpecialtyBuilder.class
 com\emedicalbooking\service\AuthService.class
 com\emedicalbooking\dto\response\DoctorDetailResponse$DoctorInfoData$DoctorInfoDataBuilder.class
 com\emedicalbooking\repository\AllCodeRepository.class
+com\emedicalbooking\config\WeeklyResetScheduler.class
 com\emedicalbooking\service\impl\PatientProfileServiceImpl.class
 com\emedicalbooking\repository\SpecialtyRepository.class
 com\emedicalbooking\repository\BookingRepository.class

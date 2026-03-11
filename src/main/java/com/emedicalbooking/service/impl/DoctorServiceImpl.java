@@ -141,6 +141,7 @@ public class DoctorServiceImpl implements DoctorService {
                     .nameClinic(info.getNameClinic())
                     .addressClinic(info.getAddressClinic())
                     .note(info.getNote())
+                    .clinicId(info.getClinic() != null ? info.getClinic().getId() : null)
                     .specialtyIds(specialtyIds)
                     .priceTypeData(toAllCodeResponse(info.getPriceData()))
                     .provinceTypeData(toAllCodeResponse(info.getProvinceData()))

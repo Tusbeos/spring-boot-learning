@@ -29,8 +29,8 @@ public class ClinicServiceImpl implements ClinicService {
         Clinic clinic = Clinic.builder()
                 .name(request.getName())
                 .address(request.getAddress())
-                .image(Base64.getDecoder().decode(request.getImageBase64()))
-                .imageCover(Base64.getDecoder().decode(request.getImageCoverBase64()))
+                .image(decodeBase64Image(request.getImageBase64()))
+                .imageCover(decodeBase64Image(request.getImageCoverBase64()))
                 .descriptionHTML(request.getDescriptionHTML())
                 .descriptionMarkdown(request.getDescriptionMarkdown())
                 .build();
@@ -66,10 +66,18 @@ public class ClinicServiceImpl implements ClinicService {
         if (request.getAddress() != null) clinic.setAddress(request.getAddress());
         if (request.getDescriptionHTML() != null) clinic.setDescriptionHTML(request.getDescriptionHTML());
         if (request.getDescriptionMarkdown() != null) clinic.setDescriptionMarkdown(request.getDescriptionMarkdown());
-        if (request.getImageBase64() != null) clinic.setImage(Base64.getDecoder().decode(request.getImageBase64()));
-        if (request.getImageCoverBase64() != null) clinic.setImageCover(Base64.getDecoder().decode(request.getImageCoverBase64()));
+        if (request.getImageBase64() != null) clinic.setImage(decodeBase64Image(request.getImageBase64()));
+        if (request.getImageCoverBase64() != null) clinic.setImageCover(decodeBase64Image(request.getImageCoverBase64()));
 
         clinicRepository.save(clinic);
+    }
+
+    /** Xử lý cả 2 dạng: chuỗi base64 thuần và data URI (data:image/...;base64,...) */
+    private byte[] decodeBase64Image(String imageBase64) {
+        String pure = imageBase64.contains(",")
+                ? imageBase64.substring(imageBase64.indexOf(',') + 1)
+                : imageBase64;
+        return Base64.getDecoder().decode(pure.trim());
     }
 
     @Override

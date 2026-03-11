@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
             user.setPositionData(findAllCode(request.getPositionId()));
         }
         if (request.getAvatar() != null) {
-            user.setImage(Base64.getDecoder().decode(request.getAvatar()));
+            user.setImage(decodeBase64Image(request.getAvatar()));
         }
 
         userRepository.save(user);
@@ -92,8 +92,8 @@ public class UserServiceImpl implements UserService {
         user.setRoleData(findAllCode(request.getRoleId()));
         user.setPositionData(findAllCode(request.getPositionId()));
 
-        if (request.getImage() != null) {
-            user.setImage(Base64.getDecoder().decode(request.getImage()));
+        if (request.getAvatar() != null) {
+            user.setImage(decodeBase64Image(request.getAvatar()));
         }
 
         userRepository.save(user);
@@ -105,6 +105,13 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
         userRepository.delete(user);
+    }
+
+    private byte[] decodeBase64Image(String imageBase64) {
+        String pure = imageBase64.contains(",")
+                ? imageBase64.substring(imageBase64.indexOf(',') + 1)
+                : imageBase64;
+        return Base64.getDecoder().decode(pure.trim());
     }
 
     private AllCode findAllCode(String keyMap) {

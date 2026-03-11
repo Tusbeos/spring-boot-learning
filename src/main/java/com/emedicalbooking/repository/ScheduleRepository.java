@@ -29,5 +29,11 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
            "WHERE s.id = :id AND s.currentNumber < s.maxNumber")
     int incrementCurrentNumber(@Param("id") int scheduleId);
 
+    /** Giảm currentNumber khi xoá lịch hẽn hết hạn. Chỉ giảm khi còn > 0 để tránh âm. */
+    @Modifying
+    @Query("UPDATE Schedule s SET s.currentNumber = s.currentNumber - 1 " +
+           "WHERE s.id = :id AND s.currentNumber > 0")
+    int decrementCurrentNumber(@Param("id") int scheduleId);
+
     void deleteByDoctorIdAndDate(int doctorId, String date);
 }

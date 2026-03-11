@@ -13,14 +13,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Tổng đài xử lý lỗi toàn cục.
- *
- * @RestControllerAdvice: áp dụng cho tất cả @RestController trong project.
- * Khi bất kỳ Controller nào throw exception → class này tự động bắt và trả về JSON.
- *
- * Không cần try/catch trong Controller hay Service, cứ "throw" là class này lo.
- */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -49,14 +41,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
-    /**
-     * Bắt lỗi 403 - Không có quyền.
-     * Ví dụ: bệnh nhân xóa booking của người khác
-     */
-    /**
-     * Bắt lỗi 401 - Sai username/password khi đăng nhập.
-     * Spring Security throw BadCredentialsException khi login thất bại
-     */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentials(BadCredentialsException ex) {
         log.warn("Bad credentials attempt");
@@ -97,10 +81,6 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    /**
-     * Bắt lỗi IllegalArgumentException - dữ liệu đầu vào không hợp lệ ở tầng business logic.
-     * Ví dụ: mật khẩu cũ không đúng, mật khẩu mới không khớp xác nhận
-     */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
         log.warn("Illegal argument: {}", ex.getMessage());
