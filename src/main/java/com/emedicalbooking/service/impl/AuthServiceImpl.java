@@ -80,29 +80,79 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthResponse login(LoginRequest request) {
-        // Bước 1: Spring Security tự xác thực (so sánh password với BCrypt hash trong DB)
+        // Lấy thông tin user (đã gộp fetch role để tránh lazy exception)
+        User user = userRepository.findByEmailWithRole(request.getEmail())
+                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("Email hoặc mật khẩu không đúng"));
+
+        // Xác thực mật khẩu
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        // Bước 2: Lấy thông tin user và tạo token
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
+        // Build UserDetails tay (tránh query DB lần 2)
+        java.util.List<org.springframework.security.core.authority.SimpleGrantedAuthority> authorities = java.util.Collections.emptyList();
+        if (user.getRoleData() != null) {
+            authorities = java.util.Collections.singletonList(
+                    new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + user.getRoleData().getKeyMap())
+            );
+        }
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getEmail(), user.getPassword(), authorities
+        );
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtTokenProvider.generateToken(userDetails);
+        String refreshToken = jwtTokenProvider.generateRefreshToken();
 
-        // Load user with role to avoid LazyInitializationException
-        User userWithRole = userRepository.findByEmailWithRole(user.getEmail()).orElse(user);
+        // Lưu refresh token vào DB (thời hạn 7 ngày = 168 giờ)
+        user.setRefreshToken(refreshToken);
+        user.setRefreshTokenExpiry(java.time.LocalDateTime.now().plusDays(7));
+        userRepository.save(user);
 
         return AuthResponse.builder()
                 .id(user.getId())
                 .token(token)
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .roleId(userWithRole.getRoleData() != null ? userWithRole.getRoleData().getKeyMap() : null)
+                .roleId(user.getRoleData() != null ? user.getRoleData().getKeyMap() : null)
+                .build();
+    }
+
+    @Override
+    public AuthResponse refresh(com.emedicalbooking.dto.request.RefreshTokenRequest request) {
+        // Tìm user theo refresh token
+        User user = userRepository.findByRefreshToken(request.getRefreshToken())
+                .orElseThrow(() -> new IllegalArgumentException("Refresh Token không hợp lệ hoặc đã đăng xuất"));
+
+        // Kiểm tra hết hạn
+        if (user.getRefreshTokenExpiry() == null || user.getRefreshTokenExpiry().isBefore(java.time.LocalDateTime.now())) {
+            throw new IllegalArgumentException("Refresh Token đã hết hạn. Vui lòng đăng nhập lại.");
+        }
+
+        // Tạo access token mới
+        java.util.List<org.springframework.security.core.authority.SimpleGrantedAuthority> authorities = java.util.Collections.emptyList();
+        if (user.getRoleData() != null) {
+            authorities = java.util.Collections.singletonList(
+                    new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + user.getRoleData().getKeyMap())
+            );
+        }
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getEmail(), user.getPassword(), authorities
+        );
+
+        String newToken = jwtTokenProvider.generateToken(userDetails);
+
+        return AuthResponse.builder()
+                .id(user.getId())
+                .token(newToken)
+                .refreshToken(user.getRefreshToken()) // Trả lại token cũ (hoặc có thể rotate token mới ở đây)
+                .tokenType("Bearer")
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .roleId(user.getRoleData() != null ? user.getRoleData().getKeyMap() : null)
                 .build();
     }
 }

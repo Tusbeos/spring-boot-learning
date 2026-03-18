@@ -32,6 +32,7 @@ public class Markdown {
     private int doctorId;
     private int clinicId;
     private int specialtyId;
+    private int packageId;
 
     
 

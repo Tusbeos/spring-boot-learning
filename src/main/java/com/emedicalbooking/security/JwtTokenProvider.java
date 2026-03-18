@@ -25,11 +25,21 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(UserDetails userDetails) {
+        String roles = userDetails.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .collect(java.util.stream.Collectors.joining(","));
+
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .claim("roles", roles)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
+
+    public String generateRefreshToken() {
+        return java.util.UUID.randomUUID().toString();
+    }
+
 }

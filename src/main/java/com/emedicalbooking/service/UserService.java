@@ -15,9 +15,9 @@ public interface UserService {
 
     void createUser(CreateUserRequest request);
 
-    void updateUser(int id, UpdateUserRequest request);
+    void updateUser(int id, UpdateUserRequest request, String currentUserEmail);
 
     void deleteUser(int id);
 
-    void changePassword(int userId, ChangePasswordRequest request);
+    void changePassword(int userId, ChangePasswordRequest request, String currentUserEmail);
 }

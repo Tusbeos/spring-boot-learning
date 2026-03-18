@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
+    Optional<User> findByRefreshToken(String refreshToken);
 
     // JOIN FETCH roleData để tránh LazyInitializationException khi load role
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.roleData WHERE u.email = :email")

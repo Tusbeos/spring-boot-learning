@@ -26,6 +26,12 @@ public class User {
     private String address;
     private String phoneNumber;
 
+    @Column(name = "refresh_token", length = 500)
+    private String refreshToken;
+
+    @Column(name = "refresh_token_expiry")
+    private LocalDateTime refreshTokenExpiry;
+
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] image;

@@ -64,4 +64,20 @@ public class AuthController {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(ApiResponse.success("Đăng nhập thành công", response));
     }
+
+    /**
+     * POST /api/auth/refresh
+     * Cấp lại Access Token mới dựa trên Refresh Token.
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<AuthResponse>> refresh(
+            @Valid @RequestBody com.emedicalbooking.dto.request.RefreshTokenRequest request) {
+        try {
+            AuthResponse response = authService.refresh(request);
+            return ResponseEntity.ok(ApiResponse.success("Làm mới token thành công", response));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
 }

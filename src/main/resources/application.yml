@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/e_medical_booking?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
     username: root
-    password: root # ← Thay bằng password MySQL của bạn
+    password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   # ==================== JPA / HIBERNATE ====================
@@ -28,8 +28,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: biconghi123@gmail.com
-    password: plyj tqsu jgzt clam
+    username: ${MAIL_USERNAME:biconghi123@gmail.com}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -41,12 +41,12 @@ spring:
 # Cấu hình riêng (không phải của Spring) - JwtTokenProvider đọc 2 giá trị này
 app:
   jwt:
-    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     expiration-ms: 86400000 # 24h
 
   booking:
     # AES-256 key dùng mã hoá token gửi qua email (tối thiểu 32 ký tự)
-    token-secret: eMedBook@2026#SecretKey!AES256OK
+    token-secret: ${BOOKING_TOKEN_SECRET:eMedBook@2026#SecretKey!AES256OK}
     # Thời gian hiệu lực của token xác nhận đặt lịch (phút)
     token-expiry-minutes: 5
 

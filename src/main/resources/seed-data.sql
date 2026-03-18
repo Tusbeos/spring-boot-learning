@@ -67,7 +67,20 @@ INSERT IGNORE INTO all_codes (id, key_map, type, value_en, value_vi) VALUES
 (40, 'PRO7',  'PROVINCE', 'Quang Ninh',              'Quảng Ninh'),
 (41, 'PRO8',  'PROVINCE', 'Hue',                     'Thừa Thiên Huế'),
 (42, 'PRO9',  'PROVINCE', 'Quang Binh',              'Quảng Bình'),
-(43, 'PRO10', 'PROVINCE', 'Khanh Hoa',               'Khánh Hòa');
+(43, 'PRO10', 'PROVINCE', 'Khanh Hoa',               'Khánh Hòa'),
+-- PACKAGE (loại gói khám)
+(46, 'PK1',  'PACKAGE',  'Basic',                    'Cơ bản'),
+(47, 'PK2',  'PACKAGE',  'VIP',                      'VIP'),
+(48, 'PK3',  'PACKAGE',  'Advanced',                 'Nâng cao'),
+(49, 'PK4',  'PACKAGE',  'Pre-Marital',              'Tiền Hôn Nhân'),
+(50, 'PK5',  'PACKAGE',  'Women\'s Health',          'Nữ'),
+(51, 'PK6',  'PACKAGE',  'Cancer Screening',         'Tầm Soát Ung Thư'),
+(52, 'PK7',  'PACKAGE',  'General Disease',          'Bệnh Lý Chung'),
+-- GROUP_SERVICE (nhóm dịch vụ trong gói khám)
+(53, 'GS1',  'GROUP_SERVICE', 'Clinical Examination',                        'Khám lâm sàng'),
+(54, 'GS2',  'GROUP_SERVICE', 'Laboratory Tests',                            'Xét nghiệm'),
+(55, 'GS3',  'GROUP_SERVICE', 'Imaging & Functional Diagnostics',            'Chẩn đoán hình ảnh và thăm dò chức năng'),
+(56, 'GS4',  'GROUP_SERVICE', 'Result Consultation',                         'Tư vấn kết quả');
 
 -- ============================================================
 -- KIỂM TRA KẾT QUẢ

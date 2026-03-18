@@ -64,6 +64,8 @@ public class SecurityConfig {
             "/api/clinics",
             "/api/clinics/{id}",
             "/api/clinics/{id}/doctors",
+            "/api/packages",
+            "/api/packages/{id}",
             "/api/bookings/verify"
     };
 
@@ -95,6 +97,9 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/clinics").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/clinics/{id}").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/clinics/{id}").hasRole(ROLE_ADMIN)
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/packages").hasRole(ROLE_ADMIN)
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/packages/{id}").hasRole(ROLE_ADMIN)
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/packages/{id}").hasRole(ROLE_ADMIN)
 
                 // Doctor-only: manage own schedules, services, info, confirm bookings
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/doctors/{id}/schedules").hasAnyRole(ROLE_DOCTOR, ROLE_ADMIN)
@@ -143,17 +148,21 @@ public class SecurityConfig {
                 .build();
     }
 
-    /**
-     * Vì JWT không mang claims về roles, converter này load roles từ DB
-     * qua UserDetailsService — giữ nguyên hành vi như JwtAuthenticationFilter cũ.
-     * KHÔNG dùng @Bean vì Spring MVC ConversionService sẽ scan và lỗi khi
-     * không xác định được generic type S/T từ lambda.
-     */
     public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
         return jwt -> {
             String email = jwt.getSubject();
-            var userDetails = userDetailsService.loadUserByUsername(email);
-            return new JwtAuthenticationToken(jwt, userDetails.getAuthorities(), email);
+            
+            // Lấy roles từ JWT (bỏ query DB)
+            String rolesStr = jwt.getClaimAsString("roles");
+            List<org.springframework.security.core.authority.SimpleGrantedAuthority> authorities = java.util.Collections.emptyList();
+            
+            if (rolesStr != null && !rolesStr.isEmpty()) {
+                authorities = java.util.Arrays.stream(rolesStr.split(","))
+                        .map(org.springframework.security.core.authority.SimpleGrantedAuthority::new)
+                        .toList();
+            }
+            
+            return new JwtAuthenticationToken(jwt, authorities, email);
         };
     }
 

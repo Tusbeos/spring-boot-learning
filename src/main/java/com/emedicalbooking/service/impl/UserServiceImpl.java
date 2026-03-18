@@ -79,9 +79,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(int id, UpdateUserRequest request) {
+    public void updateUser(int id, UpdateUserRequest request, String currentUserEmail) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
+        // Kiểm tra quyền: Admin (R1) có thể sửa bất kỳ user, còn lại chỉ được sửa chính mình
+        User currentUser = userRepository.findByEmailWithRole(currentUserEmail).orElse(null);
+        boolean isAdmin = currentUser != null
+                && currentUser.getRoleData() != null
+                && "R1".equals(currentUser.getRoleData().getKeyMap());
+                
+        if (!isAdmin && (currentUser == null || currentUser.getId() != id)) {
+            throw new org.springframework.security.access.AccessDeniedException("Bạn không có quyền cập nhật thông tin user khác");
+        }
 
         if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
         if (request.getLastName() != null) user.setLastName(request.getLastName());
@@ -115,17 +125,22 @@ public class UserServiceImpl implements UserService {
     }
 
     private AllCode findAllCode(String keyMap) {
-        return allCodeRepository.findAll().stream()
-                .filter(a -> a.getKeyMap().equals(keyMap))
-                .findFirst()
+        if (keyMap == null) return null;
+        return allCodeRepository.findByKeyMap(keyMap)
                 .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", keyMap));
     }
 
     @Override
     @Transactional
-    public void changePassword(int userId, ChangePasswordRequest request) {
+    public void changePassword(int userId, ChangePasswordRequest request, String currentUserEmail) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        // Kiểm tra quyền: Chỉ cho phép user đổi mật khẩu của chính mình
+        User currentUser = userRepository.findByEmailWithRole(currentUserEmail).orElse(null);
+        if (currentUser == null || currentUser.getId() != userId) {
+            throw new org.springframework.security.access.AccessDeniedException("Bạn chỉ có thể đổi mật khẩu cho chính mình");
+        }
 
         // Kiểm tra mật khẩu cũ có đúng không
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {

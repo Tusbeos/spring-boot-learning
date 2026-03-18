@@ -24,7 +24,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
@@ -49,20 +48,8 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> updateUser(@PathVariable int id,
                                                          @Valid @RequestBody UpdateUserRequest request,
                                                          @AuthenticationPrincipal Jwt jwt) {
-        // Kiểm tra quyền: Admin (R1) có thể sửa bất kỳ user, còn lại chỉ được sửa chính mình
         String email = jwt.getSubject();
-        User currentUser = userRepository.findByEmailWithRole(email).orElse(null);
-        boolean isAdmin = currentUser != null
-                && currentUser.getRoleData() != null
-                && "R1".equals(currentUser.getRoleData().getKeyMap());
-        if (!isAdmin && (currentUser == null || currentUser.getId() != id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.<Void>builder()
-                            .errCode(1)
-                            .errMessage("Bạn không có quyền cập nhật thông tin user khác")
-                            .build());
-        }
-        userService.updateUser(id, request);
+        userService.updateUser(id, request, email);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật user thành công", null));
     }
 
@@ -76,17 +63,8 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> changePassword(@PathVariable int id,
                                                              @Valid @RequestBody ChangePasswordRequest request,
                                                              @AuthenticationPrincipal Jwt jwt) {
-        // Chỉ cho phép user đổi mật khẩu của chính mình
         String email = jwt.getSubject();
-        User currentUser = userRepository.findByEmailWithRole(email).orElse(null);
-        if (currentUser == null || currentUser.getId() != id) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.<Void>builder()
-                            .errCode(1)
-                            .errMessage("Bạn chỉ có thể đổi mật khẩu cho chính mình")
-                            .build());
-        }
-        userService.changePassword(id, request);
+        userService.changePassword(id, request, email);
         return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công", null));
     }
 }

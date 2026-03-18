@@ -185,9 +185,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private AllCode findAllCode(String keyMap) {
-        return allCodeRepository.findAll().stream()
-                .filter(a -> a.getKeyMap().equals(keyMap))
-                .findFirst()
+        if (keyMap == null) return null;
+        return allCodeRepository.findByKeyMap(keyMap)
                 .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", keyMap));
     }
 }
