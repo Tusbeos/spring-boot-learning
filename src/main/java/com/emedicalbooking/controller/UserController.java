@@ -5,8 +5,6 @@ import com.emedicalbooking.dto.request.CreateUserRequest;
 import com.emedicalbooking.dto.request.UpdateUserRequest;
 import com.emedicalbooking.dto.response.ApiResponse;
 import com.emedicalbooking.dto.response.UserResponse;
-import com.emedicalbooking.entity.User;
-import com.emedicalbooking.repository.UserRepository;
 import com.emedicalbooking.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

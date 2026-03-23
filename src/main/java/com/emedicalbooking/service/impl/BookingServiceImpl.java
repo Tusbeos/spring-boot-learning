@@ -5,7 +5,6 @@ import com.emedicalbooking.dto.request.ConfirmBookingRequest;
 import com.emedicalbooking.dto.request.VerifyBookingRequest;
 import com.emedicalbooking.entity.AllCode;
 import com.emedicalbooking.entity.Booking;
-import com.emedicalbooking.entity.DoctorInfos;
 import com.emedicalbooking.entity.PatientProfile;
 import com.emedicalbooking.entity.Schedule;
 import com.emedicalbooking.entity.User;

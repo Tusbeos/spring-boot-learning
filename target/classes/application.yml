@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev} # Mặc định là profile 'dev' nếu không được truyền vào
+  
   # ==================== DATABASE ====================
   # Cấu hình kết nối MySQL
   datasource:
@@ -6,22 +9,6 @@ spring:
     username: root
     password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
-  # ==================== JPA / HIBERNATE ====================
-  jpa:
-    hibernate:
-      # update = tự động thêm bảng/cột mới, không xóa data cũ
-      ddl-auto: update
-    properties:
-      hibernate:
-        # KHÔNG chỉ định dialect: Hibernate 6 (Spring Boot 3.x) tự detect từ JDBC URL
-        # Điều này cho phép test dùng H2 vẫn hoạt động bình thường
-        # In SQL ra console để debug (tắt khi deploy production)
-        show_sql: true
-        format_sql: true
-    # Không muốn thấy SQL thì đổi show-sql: false
-    show-sql: true
-    open-in-view: false # Tắt để tránh lỗi "N+1 query" không kiểm soát được
 
   # ==================== MAIL ====================
   # Dùng Gmail SMTP để gửi email (xác nhận đặt lịch, quên mật khẩu...)
@@ -53,11 +40,3 @@ app:
 # ==================== SERVER ====================
 server:
   port: 8888
-
-# ==================== LOGGING ====================
-logging:
-  level:
-    # Xem log của Spring Security để debug lỗi 401/403
-    org.springframework.security: DEBUG
-    # Tắt log thừa của Hibernate
-    org.hibernate.SQL: DEBUG

@@ -20,3 +20,7 @@ Thumbs.db
 # === Logs ===
 *.log
 .env    
+
+# === Configuration (To not push secrets or personal DB configs) ===
+application*.yml
+application*.properties

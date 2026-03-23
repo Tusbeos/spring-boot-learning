@@ -9,7 +9,6 @@ import com.emedicalbooking.exception.ResourceNotFoundException;
 import com.emedicalbooking.repository.*;
 import com.emedicalbooking.service.DoctorService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
