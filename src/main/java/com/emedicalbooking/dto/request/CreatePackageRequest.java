@@ -17,7 +17,7 @@ public class CreatePackageRequest {
     private String typeCode;
 
     @NotNull(message = "Phòng khám không được để trống")
-    private Integer clinicId;
+    private Long clinicId;
 
     @Min(value = 0, message = "Giá không được âm")
     private int price;

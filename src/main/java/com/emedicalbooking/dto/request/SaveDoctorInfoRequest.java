@@ -37,10 +37,10 @@ public class SaveDoctorInfoRequest {
     private String note;
 
     @NotNull(message = "clinicId không được để trống")
-    private Integer clinicId;
+    private Long clinicId;
 
     @NotNull(message = "specialtyIds không được để trống")
-    private List<Integer> specialtyIds;
+    private List<Long> specialtyIds;
 
     private String description;
 }

@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponse getUserById(int id) {
+    public UserResponse getUserById(Long id) {
         return userRepository.findById(id)
                 .map(UserResponse::from)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(int id, UpdateUserRequest request, String currentUserEmail) {
+    public void updateUser(Long id, UpdateUserRequest request, String currentUserEmail) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
@@ -99,8 +99,16 @@ public class UserServiceImpl implements UserService {
         if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
 
         user.setGenderData(findAllCode(request.getGender()));
-        user.setRoleData(findAllCode(request.getRoleId()));
-        user.setPositionData(findAllCode(request.getPositionId()));
+
+        // Chỉ Admin mới được thay đổi role và position
+        if (isAdmin) {
+            if (request.getRoleId() != null) {
+                user.setRoleData(findAllCode(request.getRoleId()));
+            }
+            if (request.getPositionId() != null) {
+                user.setPositionData(findAllCode(request.getPositionId()));
+            }
+        }
 
         if (request.getAvatar() != null) {
             user.setImage(decodeBase64Image(request.getAvatar()));
@@ -111,7 +119,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(int id) {
+    public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
         userRepository.delete(user);
@@ -132,7 +140,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void changePassword(int userId, ChangePasswordRequest request, String currentUserEmail) {
+    public void changePassword(Long userId, ChangePasswordRequest request, String currentUserEmail) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 

@@ -56,7 +56,7 @@ public class SpecialtyServiceImpl implements SpecialtyService {
 
     @Override
     @Transactional
-    public void updateSpecialty(int id, UpdateSpecialtyRequest request) {
+    public void updateSpecialty(Long id, UpdateSpecialtyRequest request) {
         Specialty specialty = specialtyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Specialty", "id", id));
 
@@ -78,7 +78,7 @@ public class SpecialtyServiceImpl implements SpecialtyService {
 
     @Override
     @Transactional
-    public void deleteSpecialty(int id) {
+    public void deleteSpecialty(Long id) {
         Specialty specialty = specialtyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Specialty", "id", id));
 

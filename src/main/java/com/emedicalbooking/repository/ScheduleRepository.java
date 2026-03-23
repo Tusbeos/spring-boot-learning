@@ -9,14 +9,14 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
+public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     @Query("SELECT s FROM Schedule s LEFT JOIN FETCH s.timeTypeData WHERE s.doctor.id = :doctorId AND s.date = :date")
-    List<Schedule> findByDoctorIdAndDate(@Param("doctorId") int doctorId, @Param("date") String date);
+    List<Schedule> findByDoctorIdAndDate(@Param("doctorId") Long doctorId, @Param("date") String date);
 
     @Query("SELECT s FROM Schedule s WHERE s.doctor.id = :doctorId AND s.date = :date AND s.timeTypeData.keyMap = :timeType")
     Optional<Schedule> findByDoctorIdAndDateAndTimeType(
-            @Param("doctorId") int doctorId,
+            @Param("doctorId") Long doctorId,
             @Param("date") String date,
             @Param("timeType") String timeType);
 
@@ -27,13 +27,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
     @Modifying
     @Query("UPDATE Schedule s SET s.currentNumber = s.currentNumber + 1 " +
            "WHERE s.id = :id AND s.currentNumber < s.maxNumber")
-    int incrementCurrentNumber(@Param("id") int scheduleId);
+    int incrementCurrentNumber(@Param("id") Long scheduleId);
 
     /** Giảm currentNumber khi xoá lịch hẽn hết hạn. Chỉ giảm khi còn > 0 để tránh âm. */
     @Modifying
     @Query("UPDATE Schedule s SET s.currentNumber = s.currentNumber - 1 " +
            "WHERE s.id = :id AND s.currentNumber > 0")
-    int decrementCurrentNumber(@Param("id") int scheduleId);
+    int decrementCurrentNumber(@Param("id") Long scheduleId);
 
-    void deleteByDoctorIdAndDate(int doctorId, String date);
+    void deleteByDoctorIdAndDate(Long doctorId, String date);
 }

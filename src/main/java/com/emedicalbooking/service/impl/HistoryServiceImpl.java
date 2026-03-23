@@ -47,7 +47,7 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<HistoryResponse> getHistoryByPatient(int patientId) {
+    public List<HistoryResponse> getHistoryByPatient(Long patientId) {
         return historyRepository.findByPatientId(patientId)
                 .stream()
                 .map(this::toResponse)
@@ -56,7 +56,7 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<HistoryResponse> getHistoryByDoctor(int doctorId) {
+    public List<HistoryResponse> getHistoryByDoctor(Long doctorId) {
         return historyRepository.findByDoctorId(doctorId)
                 .stream()
                 .map(this::toResponse)
@@ -65,7 +65,7 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<HistoryResponse> getHistoryByBooking(int bookingId) {
+    public Optional<HistoryResponse> getHistoryByBooking(Long bookingId) {
         return historyRepository.findByBookingId(bookingId)
                 .map(this::toResponse);
     }

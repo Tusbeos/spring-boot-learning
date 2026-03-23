@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface DoctorServiceRepository extends JpaRepository<DoctorService, Integer> {
+public interface DoctorServiceRepository extends JpaRepository<DoctorService, Long> {
 
-    List<DoctorService> findByDoctorId(int doctorId);
+    List<DoctorService> findByDoctorId(Long doctorId);
 
-    void deleteAllByDoctorId(int doctorId);
+    void deleteAllByDoctorId(Long doctorId);
 }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DoctorDetailResponse {
-    private int id;
+    private Long id;
     private String email;
     private String firstName;
     private String lastName;
@@ -46,8 +46,8 @@ public class DoctorDetailResponse {
         private String nameClinic;
         private String addressClinic;
         private String note;
-        private Integer clinicId;
-        private java.util.List<Integer> specialtyIds;
+        private Long clinicId;
+        private java.util.List<Long> specialtyIds;
         private AllCodeResponse priceTypeData;
         private AllCodeResponse provinceTypeData;
         private AllCodeResponse paymentTypeData;

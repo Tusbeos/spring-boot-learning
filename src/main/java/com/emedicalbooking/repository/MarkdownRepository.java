@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface MarkdownRepository extends JpaRepository<Markdown, Integer> {
+public interface MarkdownRepository extends JpaRepository<Markdown, Long> {
 
-    Optional<Markdown> findFirstByDoctorId(int doctorId);
+    Optional<Markdown> findFirstByDoctorId(Long doctorId);
 
-    Optional<Markdown> findFirstByPackageId(int packageId);
+    Optional<Markdown> findFirstByPackageId(Long packageId);
 }

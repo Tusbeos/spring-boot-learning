@@ -38,7 +38,7 @@ public class HistoryController {
      */
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<ApiResponse<List<HistoryResponse>>> getByPatient(
-            @PathVariable int patientId) {
+            @PathVariable Long patientId) {
         List<HistoryResponse> list = historyService.getHistoryByPatient(patientId);
         return ResponseEntity.ok(ApiResponse.success(null, list));
     }
@@ -49,7 +49,7 @@ public class HistoryController {
      */
     @GetMapping("/doctor/{doctorId}")
     public ResponseEntity<ApiResponse<List<HistoryResponse>>> getByDoctor(
-            @PathVariable int doctorId) {
+            @PathVariable Long doctorId) {
         List<HistoryResponse> list = historyService.getHistoryByDoctor(doctorId);
         return ResponseEntity.ok(ApiResponse.success(null, list));
     }
@@ -60,7 +60,7 @@ public class HistoryController {
      */
     @GetMapping("/booking/{bookingId}")
     public ResponseEntity<ApiResponse<HistoryResponse>> getByBooking(
-            @PathVariable int bookingId) {
+            @PathVariable Long bookingId) {
         HistoryResponse data = historyService.getHistoryByBooking(bookingId).orElse(null);
         return ResponseEntity.ok(ApiResponse.success(null, data));
     }

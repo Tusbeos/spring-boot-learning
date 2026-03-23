@@ -162,7 +162,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public void confirmBooking(int bookingId, ConfirmBookingRequest request) {
+    public void confirmBooking(Long bookingId, ConfirmBookingRequest request) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking", "id", bookingId));
 

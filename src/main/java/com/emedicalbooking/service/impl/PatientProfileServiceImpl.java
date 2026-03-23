@@ -24,7 +24,7 @@ public class PatientProfileServiceImpl implements PatientProfileService {
 
     @Override
     @Transactional
-    public PatientProfileResponse createProfile(int userId, CreatePatientProfileRequest request) {
+    public PatientProfileResponse createProfile(Long userId, CreatePatientProfileRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng id=" + userId));
 
@@ -45,7 +45,7 @@ public class PatientProfileServiceImpl implements PatientProfileService {
     }
 
     @Override
-    public List<PatientProfileResponse> getProfilesByUser(int userId) {
+    public List<PatientProfileResponse> getProfilesByUser(Long userId) {
         return patientProfileRepository.findByUserId(userId)
                 .stream()
                 .map(this::toResponse)
@@ -53,7 +53,7 @@ public class PatientProfileServiceImpl implements PatientProfileService {
     }
 
     @Override
-    public PatientProfileResponse getProfileById(int id) {
+    public PatientProfileResponse getProfileById(Long id) {
         PatientProfile profile = patientProfileRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hồ sơ id=" + id));
         return toResponse(profile);
@@ -61,7 +61,7 @@ public class PatientProfileServiceImpl implements PatientProfileService {
 
     @Override
     @Transactional
-    public void deleteProfile(int id) {
+    public void deleteProfile(Long id) {
         if (!patientProfileRepository.existsById(id)) {
             throw new ResourceNotFoundException("Không tìm thấy hồ sơ id=" + id);
         }

@@ -17,7 +17,7 @@ public class PackageServiceItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     // Gói khám chứa dịch vụ này
     @ManyToOne(fetch = FetchType.LAZY)

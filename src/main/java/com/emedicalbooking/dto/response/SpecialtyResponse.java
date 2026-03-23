@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SpecialtyResponse {
-    private int id;
+    private Long id;
     private String name;
     private String descriptionHTML;
     private String descriptionMarkdown;

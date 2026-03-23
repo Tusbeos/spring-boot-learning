@@ -16,7 +16,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class AllCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String keyMap; 

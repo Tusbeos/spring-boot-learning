@@ -35,20 +35,20 @@ public class PackageController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PackageResponse>> getPackageById(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<PackageResponse>> getPackageById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success("OK", packageService.getPackageById(id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updatePackage(
-            @PathVariable int id,
+            @PathVariable Long id,
             @Valid @RequestBody UpdatePackageRequest request) {
         packageService.updatePackage(id, request);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật gói khám thành công", null));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deletePackage(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Void>> deletePackage(@PathVariable Long id) {
         packageService.deletePackage(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa gói khám thành công", null));
     }

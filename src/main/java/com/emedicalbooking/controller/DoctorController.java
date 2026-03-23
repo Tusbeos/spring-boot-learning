@@ -32,20 +32,20 @@ public class DoctorController {
 
     @PostMapping("/{doctorId}/info")
     public ResponseEntity<ApiResponse<Void>> saveDoctorInfo(
-            @PathVariable int doctorId,
+            @PathVariable Long doctorId,
             @Valid @RequestBody SaveDoctorInfoRequest request) {
         doctorService.saveDoctorInfo(doctorId, request);
         return ResponseEntity.ok(ApiResponse.success("Lưu thông tin bác sĩ thành công", null));
     }
 
     @GetMapping("/{doctorId}")
-    public ResponseEntity<ApiResponse<DoctorDetailResponse>> getDoctorDetail(@PathVariable int doctorId) {
+    public ResponseEntity<ApiResponse<DoctorDetailResponse>> getDoctorDetail(@PathVariable Long doctorId) {
         return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getDoctorDetail(doctorId)));
     }
 
     @PostMapping("/{doctorId}/schedules")
     public ResponseEntity<ApiResponse<Void>> bulkCreateSchedule(
-            @PathVariable int doctorId,
+            @PathVariable Long doctorId,
             @Valid @RequestBody BulkCreateScheduleRequest request) {
         doctorService.bulkCreateSchedule(doctorId, request);
         return ResponseEntity.ok(ApiResponse.success("Tạo lịch khám thành công", null));
@@ -53,37 +53,37 @@ public class DoctorController {
 
     @GetMapping("/{doctorId}/schedules")
     public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getScheduleByDate(
-            @PathVariable int doctorId,
+            @PathVariable Long doctorId,
             @RequestParam String date) {
         return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getScheduleByDate(doctorId, date)));
     }
 
     @PostMapping("/{doctorId}/services")
     public ResponseEntity<ApiResponse<Void>> bulkCreateDoctorServices(
-            @PathVariable int doctorId,
+            @PathVariable Long doctorId,
             @Valid @RequestBody BulkCreateDoctorServicesRequest request) {
         doctorService.bulkCreateDoctorServices(doctorId, request);
         return ResponseEntity.ok(ApiResponse.success("Tạo dịch vụ bác sĩ thành công", null));
     }
 
     @GetMapping("/{doctorId}/services")
-    public ResponseEntity<ApiResponse<List<DoctorServiceResponse>>> getDoctorServices(@PathVariable int doctorId) {
+    public ResponseEntity<ApiResponse<List<DoctorServiceResponse>>> getDoctorServices(@PathVariable Long doctorId) {
         return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getDoctorServices(doctorId)));
     }
 
     @GetMapping("/{doctorId}/extra-info")
-    public ResponseEntity<ApiResponse<DoctorExtraInfoResponse>> getExtraInfo(@PathVariable int doctorId) {
+    public ResponseEntity<ApiResponse<DoctorExtraInfoResponse>> getExtraInfo(@PathVariable Long doctorId) {
         return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getExtraInfo(doctorId)));
     }
 
     @GetMapping("/{doctorId}/specialties")
-    public ResponseEntity<ApiResponse<List<Integer>>> getSpecialtiesByDoctorId(@PathVariable int doctorId) {
+    public ResponseEntity<ApiResponse<List<Long>>> getSpecialtiesByDoctorId(@PathVariable Long doctorId) {
         return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getSpecialtiesByDoctorId(doctorId)));
     }
 
     @GetMapping("/{doctorId}/patients")
     public ResponseEntity<ApiResponse<List<PatientBookingResponse>>> getPatientsByDoctor(
-            @PathVariable int doctorId,
+            @PathVariable Long doctorId,
             @RequestParam String date) {
         return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getPatientsByDoctorAndDate(doctorId, date)));
     }

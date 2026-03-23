@@ -45,20 +45,20 @@ public class SpecialtyController {
 
     @GetMapping("/{specialtyId}/doctors")
     public ResponseEntity<ApiResponse<List<DoctorDetailResponse>>> getDoctorsBySpecialtyId(
-            @PathVariable int specialtyId) {
+            @PathVariable Long specialtyId) {
         return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getDoctorsBySpecialtyId(specialtyId)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updateSpecialty(
-            @PathVariable int id,
+            @PathVariable Long id,
             @Valid @RequestBody UpdateSpecialtyRequest request) {
         specialtyService.updateSpecialty(id, request);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật chuyên khoa thành công", null));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteSpecialty(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Void>> deleteSpecialty(@PathVariable Long id) {
         specialtyService.deleteSpecialty(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa chuyên khoa thành công", null));
     }

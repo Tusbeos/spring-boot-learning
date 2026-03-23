@@ -14,7 +14,7 @@ public interface SpecialtyService {
 
     List<SpecialtyResponse> getSpecialtiesByIds(List<Integer> ids);
 
-    void updateSpecialty(int id, UpdateSpecialtyRequest request);
+    void updateSpecialty(Long id, UpdateSpecialtyRequest request);
 
-    void deleteSpecialty(int id);
+    void deleteSpecialty(Long id);
 }

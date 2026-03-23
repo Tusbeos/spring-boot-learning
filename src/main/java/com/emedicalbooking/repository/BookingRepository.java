@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface BookingRepository extends JpaRepository<Booking, Integer> {
+public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b FROM Booking b " +
            "LEFT JOIN FETCH b.statusData " +
@@ -18,18 +18,18 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
            "LEFT JOIN FETCH b.patientProfile " +
            "WHERE b.doctor.id = :doctorId AND b.date = :date " +
            "AND b.statusData.keyMap IN ('S1', 'S2', 'S3')")
-    List<Booking> findByDoctorAndDate(@Param("doctorId") int doctorId, @Param("date") String date);
+    List<Booking> findByDoctorAndDate(@Param("doctorId") Long doctorId, @Param("date") String date);
 
     @Query("SELECT b FROM Booking b WHERE b.patient.id = :patientId AND b.doctor.id = :doctorId " +
            "AND b.date = :date AND b.timeTypeData.keyMap = :timeType")
     Optional<Booking> findByPatientAndDoctorAndDateAndTimeType(
-            @Param("patientId") int patientId,
-            @Param("doctorId") int doctorId,
+            @Param("patientId") Long patientId,
+            @Param("doctorId") Long doctorId,
             @Param("date") String date,
             @Param("timeType") String timeType);
 
     @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.statusData WHERE b.token = :token AND b.doctor.id = :doctorId AND b.statusData.keyMap = 'S1'")
-    Optional<Booking> findByTokenAndDoctorId(@Param("token") String token, @Param("doctorId") int doctorId);
+    Optional<Booking> findByTokenAndDoctorId(@Param("token") String token, @Param("doctorId") Long doctorId);
 
     /** Lấy tất cả lịch hẽn S1 đã quá thời gian xác nhận — dùng cho scheduled cleanup */
     @Query("SELECT b FROM Booking b " +

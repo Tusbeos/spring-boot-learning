@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class CreateHistoryRequest {
 
     @NotNull(message = "bookingId không được để trống")
-    private Integer bookingId;
+    private Long bookingId;
 
     private String diagnosis;         // Chẩn đoán
     private String prescription;      // Đơn thuốc / phác đồ

@@ -50,7 +50,7 @@ public class ClinicServiceImpl implements ClinicService {
 
     @Override
     @Transactional(readOnly = true)
-    public ClinicResponse getClinicDetail(int id) {
+    public ClinicResponse getClinicDetail(Long id) {
         Clinic clinic = clinicRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", id));
         return toResponse(clinic);
@@ -58,7 +58,7 @@ public class ClinicServiceImpl implements ClinicService {
 
     @Override
     @Transactional
-    public void updateClinic(int id, UpdateClinicRequest request) {
+    public void updateClinic(Long id, UpdateClinicRequest request) {
         Clinic clinic = clinicRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", id));
 
@@ -82,7 +82,7 @@ public class ClinicServiceImpl implements ClinicService {
 
     @Override
     @Transactional
-    public void deleteClinic(int id) {
+    public void deleteClinic(Long id) {
         Clinic clinic = clinicRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", id));
 

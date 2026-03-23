@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PackageServiceItemResponse {
-    private int id;
+    private Long id;
     private String groupServiceCode;
     private AllCodeResponse groupServiceData;
     private String serviceName;

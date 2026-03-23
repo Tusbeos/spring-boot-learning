@@ -1,6 +1,5 @@
 package com.emedicalbooking.dto.response;
 
-import com.emedicalbooking.dto.response.PackageServiceItemResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +12,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PackageResponse {
-    private int id;
+    private Long id;
     private String name;
     private String typeCode;
     private AllCodeResponse typeData;
-    private int clinicId;
+    private Long clinicId;
     private String clinicName;
     private int price;
     private String note;

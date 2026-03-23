@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface PatientProfileService {
 
-    PatientProfileResponse createProfile(int userId, CreatePatientProfileRequest request);
+    PatientProfileResponse createProfile(Long userId, CreatePatientProfileRequest request);
 
-    List<PatientProfileResponse> getProfilesByUser(int userId);
+    List<PatientProfileResponse> getProfilesByUser(Long userId);
 
-    PatientProfileResponse getProfileById(int id);
+    PatientProfileResponse getProfileById(Long id);
 
-    void deleteProfile(int id);
+    void deleteProfile(Long id);
 }

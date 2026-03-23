@@ -22,7 +22,7 @@ public class PatientProfileController {
     /** Tạo hồ sơ bệnh nhân mới cho một user */
     @PostMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<PatientProfileResponse>> createProfile(
-            @PathVariable int userId,
+            @PathVariable Long userId,
             @Valid @RequestBody CreatePatientProfileRequest request) {
         PatientProfileResponse response = patientProfileService.createProfile(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -32,21 +32,21 @@ public class PatientProfileController {
     /** Lấy danh sách tất cả hồ sơ bệnh nhân của một user */
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<List<PatientProfileResponse>>> getProfilesByUser(
-            @PathVariable int userId) {
+            @PathVariable Long userId) {
         List<PatientProfileResponse> profiles = patientProfileService.getProfilesByUser(userId);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách hồ sơ thành công", profiles));
     }
 
     /** Lấy chi tiết một hồ sơ bệnh nhân theo id */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PatientProfileResponse>> getProfileById(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<PatientProfileResponse>> getProfileById(@PathVariable Long id) {
         PatientProfileResponse profile = patientProfileService.getProfileById(id);
         return ResponseEntity.ok(ApiResponse.success("Lấy hồ sơ thành công", profile));
     }
 
     /** Xoá hồ sơ bệnh nhân */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteProfile(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Void>> deleteProfile(@PathVariable Long id) {
         patientProfileService.deleteProfile(id);
         return ResponseEntity.ok(ApiResponse.success("Xoá hồ sơ thành công", null));
     }

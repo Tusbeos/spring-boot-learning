@@ -5,6 +5,8 @@ import com.emedicalbooking.dto.request.RegisterRequest;
 import com.emedicalbooking.dto.response.AuthResponse;
 import com.emedicalbooking.entity.User;
 import com.emedicalbooking.exception.DuplicateEmailException;
+import com.emedicalbooking.exception.ResourceNotFoundException;
+import com.emedicalbooking.repository.AllCodeRepository;
 import com.emedicalbooking.repository.UserRepository;
 import com.emedicalbooking.security.JwtTokenProvider;
 import com.emedicalbooking.service.AuthService;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final AllCodeRepository allCodeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
@@ -51,6 +54,8 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword())) // BCrypt hash
                 .phoneNumber(request.getPhoneNumber())
                 .address(request.getAddress())
+                .roleData(allCodeRepository.findByKeyMap("R3")
+                        .orElseThrow(() -> new ResourceNotFoundException("Role R3 không tồn tại")))
                 .build();
 
         // Bước 4: Lưu vào DB
@@ -143,16 +148,33 @@ public class AuthServiceImpl implements AuthService {
         );
 
         String newToken = jwtTokenProvider.generateToken(userDetails);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken();
+
+        // Rotate refresh token
+        user.setRefreshToken(newRefreshToken);
+        user.setRefreshTokenExpiry(java.time.LocalDateTime.now().plusDays(7));
+        userRepository.save(user);
 
         return AuthResponse.builder()
                 .id(user.getId())
                 .token(newToken)
-                .refreshToken(user.getRefreshToken()) // Trả lại token cũ (hoặc có thể rotate token mới ở đây)
+                .refreshToken(newRefreshToken)
                 .tokenType("Bearer")
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .roleId(user.getRoleData() != null ? user.getRoleData().getKeyMap() : null)
                 .build();
+    }
+
+    @Override
+    public void logout(com.emedicalbooking.dto.request.RefreshTokenRequest request) {
+        User user = userRepository.findByRefreshToken(request.getRefreshToken())
+                .orElseThrow(() -> new IllegalArgumentException("Refresh Token không hợp lệ hoặc đã đăng xuất"));
+        
+        // Remove refresh token by setting it to null
+        user.setRefreshToken(null);
+        user.setRefreshTokenExpiry(null);
+        userRepository.save(user);
     }
 }

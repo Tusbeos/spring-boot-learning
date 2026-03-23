@@ -12,9 +12,9 @@ public interface PackageService {
 
     List<PackageResponse> getAllPackages(Integer limit);
 
-    PackageResponse getPackageById(int id);
+    PackageResponse getPackageById(Long id);
 
-    void updatePackage(int id, UpdatePackageRequest request);
+    void updatePackage(Long id, UpdatePackageRequest request);
 
-    void deletePackage(int id);
+    void deletePackage(Long id);
 }

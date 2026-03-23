@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
         UserResponse user = userService.getUserById(id);
         return ResponseEntity.ok(ApiResponse.success("Lấy user thành công", user));
     }
@@ -45,7 +45,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> updateUser(@PathVariable int id,
+    public ResponseEntity<ApiResponse<Void>> updateUser(@PathVariable Long id,
                                                          @Valid @RequestBody UpdateUserRequest request,
                                                          @AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getSubject();
@@ -54,13 +54,13 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa user thành công", null));
     }
 
     @PutMapping("/{id}/change-password")
-    public ResponseEntity<ApiResponse<Void>> changePassword(@PathVariable int id,
+    public ResponseEntity<ApiResponse<Void>> changePassword(@PathVariable Long id,
                                                              @Valid @RequestBody ChangePasswordRequest request,
                                                              @AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getSubject();

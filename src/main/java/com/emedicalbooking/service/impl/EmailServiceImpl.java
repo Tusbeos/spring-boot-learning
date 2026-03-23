@@ -24,7 +24,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     @Async
     public void sendBookingConfirmationEmail(String toEmail, String patientName, String doctorName,
-                                              String timeString, String language, String token, int doctorId) {
+                                              String timeString, String language, String token, Long doctorId) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

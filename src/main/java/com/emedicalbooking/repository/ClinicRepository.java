@@ -3,5 +3,5 @@ package com.emedicalbooking.repository;
 import com.emedicalbooking.entity.Clinic;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ClinicRepository extends JpaRepository<Clinic, Integer> {
+public interface ClinicRepository extends JpaRepository<Clinic, Long> {
 }

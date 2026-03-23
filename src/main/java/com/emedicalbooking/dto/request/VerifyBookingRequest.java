@@ -11,5 +11,5 @@ public class VerifyBookingRequest {
     private String token;
 
     @NotNull(message = "doctorId không được để trống")
-    private Integer doctorId;
+    private Long doctorId;
 }

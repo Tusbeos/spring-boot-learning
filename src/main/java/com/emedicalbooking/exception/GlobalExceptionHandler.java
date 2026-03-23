@@ -115,6 +115,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Bắt lỗi 403 - Forbidden (Không có quyền truy cập)
+     */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(
+            org.springframework.security.access.AccessDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ex.getMessage() != null && !ex.getMessage().isEmpty() ? 
+                        ex.getMessage() : "Bạn không có quyền thực hiện hành động này"));
+    }
+
+    /**
      * Bắt tất cả lỗi còn lại không được xử lý ở trên.
      * Đây là "lưới an toàn" cuối cùng - trả về 500 Internal Server Error.
      * Log đầy đủ để debug, nhưng KHÔNG lộ stacktrace ra ngoài.

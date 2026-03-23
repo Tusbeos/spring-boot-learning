@@ -12,9 +12,9 @@ public interface ClinicService {
 
     List<ClinicResponse> getAllClinics(Integer limit);
 
-    ClinicResponse getClinicDetail(int id);
+    ClinicResponse getClinicDetail(Long id);
 
-    void updateClinic(int id, UpdateClinicRequest request);
+    void updateClinic(Long id, UpdateClinicRequest request);
 
-    void deleteClinic(int id);
+    void deleteClinic(Long id);
 }

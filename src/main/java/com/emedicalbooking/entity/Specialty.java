@@ -15,7 +15,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class Specialty {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String name;
 

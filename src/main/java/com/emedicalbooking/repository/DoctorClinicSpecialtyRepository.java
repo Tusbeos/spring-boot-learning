@@ -7,20 +7,20 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface DoctorClinicSpecialtyRepository extends JpaRepository<DoctorClinicSpecialty, Integer> {
+public interface DoctorClinicSpecialtyRepository extends JpaRepository<DoctorClinicSpecialty, Long> {
 
-    void deleteAllByDoctorId(int doctorId);
+    void deleteAllByDoctorId(Long doctorId);
 
     @Query("SELECT dcs.specialty.id FROM DoctorClinicSpecialty dcs WHERE dcs.doctor.id = :doctorId")
-    List<Integer> findSpecialtyIdsByDoctorId(@Param("doctorId") int doctorId);
+    List<Long> findSpecialtyIdsByDoctorId(@Param("doctorId") Long doctorId);
 
     @Query("SELECT DISTINCT dcs.doctor.id FROM DoctorClinicSpecialty dcs WHERE dcs.specialty.id = :specialtyId")
-    List<Integer> findDoctorIdsBySpecialtyId(@Param("specialtyId") int specialtyId);
+    List<Long> findDoctorIdsBySpecialtyId(@Param("specialtyId") Long specialtyId);
 
     @Query("SELECT DISTINCT dcs.doctor.id FROM DoctorClinicSpecialty dcs WHERE dcs.clinic.id = :clinicId")
-    List<Integer> findDoctorIdsByClinicId(@Param("clinicId") int clinicId);
+    List<Long> findDoctorIdsByClinicId(@Param("clinicId") Long clinicId);
 
-    void deleteAllBySpecialtyId(int specialtyId);
+    void deleteAllBySpecialtyId(Long specialtyId);
 
-    void deleteAllByClinicId(int clinicId);
+    void deleteAllByClinicId(Long clinicId);
 }

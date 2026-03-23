@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DoctorListResponse {
-    private int id;
+    private Long id;
     private String email;
     private String firstName;
     private String lastName;

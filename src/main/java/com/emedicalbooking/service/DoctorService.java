@@ -13,25 +13,25 @@ public interface DoctorService {
 
     List<DoctorListResponse> getAllDoctors();
 
-    void saveDoctorInfo(int doctorId, SaveDoctorInfoRequest request);
+    void saveDoctorInfo(Long doctorId, SaveDoctorInfoRequest request);
 
-    DoctorDetailResponse getDoctorDetail(int doctorId);
+    DoctorDetailResponse getDoctorDetail(Long doctorId);
 
-    void bulkCreateSchedule(int doctorId, BulkCreateScheduleRequest request);
+    void bulkCreateSchedule(Long doctorId, BulkCreateScheduleRequest request);
 
-    List<ScheduleResponse> getScheduleByDate(int doctorId, String date);
+    List<ScheduleResponse> getScheduleByDate(Long doctorId, String date);
 
-    void bulkCreateDoctorServices(int doctorId, BulkCreateDoctorServicesRequest request);
+    void bulkCreateDoctorServices(Long doctorId, BulkCreateDoctorServicesRequest request);
 
-    List<DoctorServiceResponse> getDoctorServices(int doctorId);
+    List<DoctorServiceResponse> getDoctorServices(Long doctorId);
 
-    DoctorExtraInfoResponse getExtraInfo(int doctorId);
+    DoctorExtraInfoResponse getExtraInfo(Long doctorId);
 
-    List<Integer> getSpecialtiesByDoctorId(int doctorId);
+    List<Long> getSpecialtiesByDoctorId(Long doctorId);
 
-    List<DoctorDetailResponse> getDoctorsBySpecialtyId(int specialtyId);
+    List<DoctorDetailResponse> getDoctorsBySpecialtyId(Long specialtyId);
 
-    List<Integer> getDoctorIdsByClinicId(int clinicId);
+    List<Long> getDoctorIdsByClinicId(Long clinicId);
 
-    List<PatientBookingResponse> getPatientsByDoctorAndDate(int doctorId, String date);
+    List<PatientBookingResponse> getPatientsByDoctorAndDate(Long doctorId, String date);
 }

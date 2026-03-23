@@ -37,25 +37,25 @@ public class ClinicController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ClinicResponse>> getClinicDetail(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<ClinicResponse>> getClinicDetail(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success("OK", clinicService.getClinicDetail(id)));
     }
 
     @GetMapping("/{clinicId}/doctors")
-    public ResponseEntity<ApiResponse<List<Integer>>> getDoctorsByClinicId(@PathVariable int clinicId) {
+    public ResponseEntity<ApiResponse<List<Long>>> getDoctorsByClinicId(@PathVariable Long clinicId) {
         return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getDoctorIdsByClinicId(clinicId)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updateClinic(
-            @PathVariable int id,
+            @PathVariable Long id,
             @Valid @RequestBody UpdateClinicRequest request) {
         clinicService.updateClinic(id, request);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật phòng khám thành công", null));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteClinic(@PathVariable int id) {
+    public ResponseEntity<ApiResponse<Void>> deleteClinic(@PathVariable Long id) {
         clinicService.deleteClinic(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa phòng khám thành công", null));
     }

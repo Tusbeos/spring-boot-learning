@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PatientBookingResponse {
-    private int id;
+    private Long id;
     private String statusId;
-    private int doctorId;
-    private int patientId;
+    private Long doctorId;
+    private Long patientId;
     private String date;
     private String timeType;
     private String token;
@@ -41,7 +41,7 @@ public class PatientBookingResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ProfileData {
-        private Integer id;
+        private Long id;
         private String firstName;
         private String lastName;
         private String phoneNumber;

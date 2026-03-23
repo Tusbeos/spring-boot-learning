@@ -80,4 +80,20 @@ public class AuthController {
                     .body(ApiResponse.error(e.getMessage()));
         }
     }
+
+    /**
+     * POST /api/auth/logout
+     * Đăng xuất, hủy Refresh Token trong database.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @Valid @RequestBody com.emedicalbooking.dto.request.RefreshTokenRequest request) {
+        try {
+            authService.logout(request);
+            return ResponseEntity.ok(ApiResponse.success("Đăng xuất thành công", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
 }

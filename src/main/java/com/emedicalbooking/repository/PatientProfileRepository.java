@@ -7,8 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface PatientProfileRepository extends JpaRepository<PatientProfile, Integer> {
+public interface PatientProfileRepository extends JpaRepository<PatientProfile, Long> {
 
     @Query("SELECT p FROM PatientProfile p WHERE p.user.id = :userId")
-    List<PatientProfile> findByUserId(@Param("userId") int userId);
+    List<PatientProfile> findByUserId(@Param("userId") Long userId);
 }

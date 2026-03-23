@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScheduleResponse {
-    private int id;
-    private int doctorId;
+    private Long id;
+    private Long doctorId;
     private String date;
     private String timeType;
     private int maxNumber;

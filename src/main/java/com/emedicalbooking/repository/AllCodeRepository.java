@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface AllCodeRepository extends JpaRepository<AllCode, Integer> {
+public interface AllCodeRepository extends JpaRepository<AllCode, Long> {
     List<AllCode> findByType(String type);
     Optional<AllCode> findByKeyMap(String keyMap);
 }

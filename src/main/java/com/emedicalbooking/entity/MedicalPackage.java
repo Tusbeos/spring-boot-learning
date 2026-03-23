@@ -18,7 +18,7 @@ public class MedicalPackage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     // Loại gói khám, nối đến all_codes qua keyMap (VD: PK1, PK2...)
     @ManyToOne(fetch = FetchType.LAZY)

@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class ConfirmBookingRequest {
 
-    private Integer doctorId;
+    private Long doctorId;
     private String statusId; // default "S3"
 }

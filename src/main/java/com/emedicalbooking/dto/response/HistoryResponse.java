@@ -10,22 +10,22 @@ import java.time.LocalDateTime;
 @Builder
 public class HistoryResponse {
 
-    private int id;
+    private Long id;
 
     // Thông tin buổi khám (từ Booking)
-    private int bookingId;
+    private Long bookingId;
     private String bookingDate;        // booking.date (timestamp string từ FE)
     private String timeType;           // keyMap của khung giờ
     private String timeTypeValueVi;    // tên khung giờ tiếng Việt
     private String timeTypeValueEn;
 
     // Thông tin bác sĩ
-    private int doctorId;
+    private Long doctorId;
     private String doctorFirstName;
     private String doctorLastName;
 
     // Thông tin bệnh nhân
-    private int patientId;
+    private Long patientId;
     private String patientFirstName;
     private String patientLastName;
     private String patientEmail;
@@ -40,7 +40,7 @@ public class HistoryResponse {
     private LocalDate examinationDate;
 
     // Thông tin người được đặt hộ (nếu đặt cho người thân, ngược lại null)
-    private Integer profileId;
+    private Long profileId;
     private String profileFirstName;
     private String profileLastName;
     private String profileRelationship;

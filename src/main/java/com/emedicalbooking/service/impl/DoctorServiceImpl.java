@@ -53,7 +53,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional
-    public void saveDoctorInfo(int doctorId, SaveDoctorInfoRequest request) {
+    public void saveDoctorInfo(Long doctorId, SaveDoctorInfoRequest request) {
         User doctor = userRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", doctorId));
 
@@ -96,7 +96,7 @@ public class DoctorServiceImpl implements DoctorService {
         doctorInfo.setClinic(clinic);
         doctorInfosRepository.save(doctorInfo);
 
-        for (Integer specialtyId : request.getSpecialtyIds()) {
+        for (Long specialtyId : request.getSpecialtyIds()) {
             Specialty specialty = specialtyRepository.findById(specialtyId)
                     .orElseThrow(() -> new ResourceNotFoundException("Specialty", "id", specialtyId));
             DoctorClinicSpecialty dcs = DoctorClinicSpecialty.builder()
@@ -110,7 +110,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional(readOnly = true)
-    public DoctorDetailResponse getDoctorDetail(int doctorId) {
+    public DoctorDetailResponse getDoctorDetail(Long doctorId) {
         User doctor = userRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", doctorId));
 
@@ -133,7 +133,7 @@ public class DoctorServiceImpl implements DoctorService {
 
         // DoctorInfo
         doctorInfosRepository.findByDoctorIdWithRelations(doctorId).stream().findFirst().ifPresent(info -> {
-            List<Integer> specialtyIds = doctorClinicSpecialtyRepository.findSpecialtyIdsByDoctorId(doctorId);
+            List<Long> specialtyIds = doctorClinicSpecialtyRepository.findSpecialtyIdsByDoctorId(doctorId);
             builder.doctorInfo(DoctorDetailResponse.DoctorInfoData.builder()
                     .priceId(info.getPriceData() != null ? info.getPriceData().getKeyMap() : null)
                     .paymentId(info.getPaymentData() != null ? info.getPaymentData().getKeyMap() : null)
@@ -154,7 +154,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional
-    public void bulkCreateSchedule(int doctorId, BulkCreateScheduleRequest request) {
+    public void bulkCreateSchedule(Long doctorId, BulkCreateScheduleRequest request) {
         User doctor = userRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", doctorId));
 
@@ -197,7 +197,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ScheduleResponse> getScheduleByDate(int doctorId, String date) {
+    public List<ScheduleResponse> getScheduleByDate(Long doctorId, String date) {
         return scheduleRepository.findByDoctorIdAndDate(doctorId, date).stream()
                 .map(s -> ScheduleResponse.builder()
                         .id(s.getId())
@@ -213,7 +213,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional
-    public void bulkCreateDoctorServices(int doctorId, BulkCreateDoctorServicesRequest request) {
+    public void bulkCreateDoctorServices(Long doctorId, BulkCreateDoctorServicesRequest request) {
         User doctor = userRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", doctorId));
 
@@ -237,7 +237,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DoctorServiceResponse> getDoctorServices(int doctorId) {
+    public List<DoctorServiceResponse> getDoctorServices(Long doctorId) {
         return doctorServiceRepository.findByDoctorId(doctorId).stream()
                 .map(ds -> DoctorServiceResponse.builder()
                         .nameVi(ds.getNameVi())
@@ -251,7 +251,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional(readOnly = true)
-    public DoctorExtraInfoResponse getExtraInfo(int doctorId) {
+    public DoctorExtraInfoResponse getExtraInfo(Long doctorId) {
         DoctorInfos info = doctorInfosRepository.findByDoctorIdWithRelations(doctorId)
                 .stream().findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("DoctorInfo", "doctorId", doctorId));
@@ -272,14 +272,14 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Integer> getSpecialtiesByDoctorId(int doctorId) {
+    public List<Long> getSpecialtiesByDoctorId(Long doctorId) {
         return doctorClinicSpecialtyRepository.findSpecialtyIdsByDoctorId(doctorId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<DoctorDetailResponse> getDoctorsBySpecialtyId(int specialtyId) {
-        List<Integer> doctorIds = doctorClinicSpecialtyRepository.findDoctorIdsBySpecialtyId(specialtyId);
+    public List<DoctorDetailResponse> getDoctorsBySpecialtyId(Long specialtyId) {
+        List<Long> doctorIds = doctorClinicSpecialtyRepository.findDoctorIdsBySpecialtyId(specialtyId);
         return doctorIds.stream()
                 .map(this::getDoctorDetail)
                 .collect(Collectors.toList());
@@ -287,18 +287,18 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Integer> getDoctorIdsByClinicId(int clinicId) {
+    public List<Long> getDoctorIdsByClinicId(Long clinicId) {
         // Gộp từ 2 nguồn để không bỏ sót bác sĩ nào:
         // 1. DoctorInfos.clinicId – bác sĩ đã chọn cơ sở y tế này
         // 2. DoctorClinicSpecialty.clinicId – bác sĩ được gán chuyên khoa tại cơ sở này
-        Set<Integer> result = new LinkedHashSet<>(doctorInfosRepository.findDoctorIdsByClinicId(clinicId));
+        Set<Long> result = new LinkedHashSet<>(doctorInfosRepository.findDoctorIdsByClinicId(clinicId));
         result.addAll(doctorClinicSpecialtyRepository.findDoctorIdsByClinicId(clinicId));
         return new ArrayList<>(result);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PatientBookingResponse> getPatientsByDoctorAndDate(int doctorId, String date) {
+    public List<PatientBookingResponse> getPatientsByDoctorAndDate(Long doctorId, String date) {
         return bookingRepository.findByDoctorAndDate(doctorId, date).stream()
                 .map(b -> {
                     // Map thông tin hồ sơ bệnh nhân được đặt hộ (nếu có)

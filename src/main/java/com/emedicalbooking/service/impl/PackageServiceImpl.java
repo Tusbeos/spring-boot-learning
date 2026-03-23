@@ -82,7 +82,7 @@ public class PackageServiceImpl implements PackageService {
 
     @Override
     @Transactional(readOnly = true)
-    public PackageResponse getPackageById(int id) {
+    public PackageResponse getPackageById(Long id) {
         MedicalPackage pkg = packageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Package", "id", id));
         return toResponse(pkg);
@@ -90,7 +90,7 @@ public class PackageServiceImpl implements PackageService {
 
     @Override
     @Transactional
-    public void updatePackage(int id, UpdatePackageRequest request) {
+    public void updatePackage(Long id, UpdatePackageRequest request) {
         MedicalPackage pkg = packageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Package", "id", id));
 
@@ -131,7 +131,7 @@ public class PackageServiceImpl implements PackageService {
 
     @Override
     @Transactional
-    public void deletePackage(int id) {
+    public void deletePackage(Long id) {
         MedicalPackage pkg = packageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Package", "id", id));
 

@@ -13,7 +13,7 @@ public class BookAppointmentRequest {
     private String email;
 
     @NotNull(message = "doctorId không được để trống")
-    private Integer doctorId;
+    private Long doctorId;
 
     @NotBlank(message = "date không được để trống")
     private String date;

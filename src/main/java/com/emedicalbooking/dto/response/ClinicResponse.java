@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClinicResponse {
-    private int id;
+    private Long id;
     private String name;
     private String address;
     private String image; // base64

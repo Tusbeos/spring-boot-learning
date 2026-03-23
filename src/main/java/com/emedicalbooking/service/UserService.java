@@ -11,13 +11,13 @@ public interface UserService {
 
     List<UserResponse> getAllUsers();
 
-    UserResponse getUserById(int id);
+    UserResponse getUserById(Long id);
 
     void createUser(CreateUserRequest request);
 
-    void updateUser(int id, UpdateUserRequest request, String currentUserEmail);
+    void updateUser(Long id, UpdateUserRequest request, String currentUserEmail);
 
-    void deleteUser(int id);
+    void deleteUser(Long id);
 
-    void changePassword(int userId, ChangePasswordRequest request, String currentUserEmail);
+    void changePassword(Long userId, ChangePasswordRequest request, String currentUserEmail);
 }

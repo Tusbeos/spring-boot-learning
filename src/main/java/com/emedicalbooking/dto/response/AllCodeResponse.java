@@ -1,6 +1,5 @@
 package com.emedicalbooking.dto.response;
 
-import com.emedicalbooking.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

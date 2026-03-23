@@ -19,7 +19,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class DoctorInfos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(nullable = true)
     private String addressClinic;

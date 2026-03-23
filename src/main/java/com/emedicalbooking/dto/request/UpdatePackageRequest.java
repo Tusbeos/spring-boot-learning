@@ -11,7 +11,7 @@ public class UpdatePackageRequest {
 
     private String typeCode;
 
-    private Integer clinicId;
+    private Long clinicId;
 
     private Integer price;
 

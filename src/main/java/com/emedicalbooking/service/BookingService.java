@@ -10,5 +10,5 @@ public interface BookingService {
 
     void verifyBooking(VerifyBookingRequest request);
 
-    void confirmBooking(int bookingId, ConfirmBookingRequest request);
+    void confirmBooking(Long bookingId, ConfirmBookingRequest request);
 }

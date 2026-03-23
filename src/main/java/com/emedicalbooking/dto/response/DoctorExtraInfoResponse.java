@@ -16,7 +16,7 @@ public class DoctorExtraInfoResponse {
     private String nameClinic;
     private String addressClinic;
     private String note;
-    private Integer clinicId;
+    private Long clinicId;
     private int count;
     private AllCodeResponse priceTypeData;
     private AllCodeResponse provinceTypeData;

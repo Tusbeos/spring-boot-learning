@@ -35,7 +35,7 @@ public class BookingController {
 
     @PostMapping("/{bookingId}/confirm")
     public ResponseEntity<ApiResponse<Void>> confirmBooking(
-            @PathVariable int bookingId,
+            @PathVariable Long bookingId,
             @Valid @RequestBody ConfirmBookingRequest request) {
         bookingService.confirmBooking(bookingId, request);
         return ResponseEntity.ok(ApiResponse.success("Xác nhận bệnh nhân thành công", null));

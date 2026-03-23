@@ -20,7 +20,7 @@ public class PatientProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     /** Người dùng đặt hộ (account holder) */
     @ManyToOne(fetch = FetchType.LAZY)

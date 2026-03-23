@@ -16,7 +16,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class Markdown {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
@@ -29,10 +29,10 @@ public class Markdown {
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     private String description;
-    private int doctorId;
-    private int clinicId;
-    private int specialtyId;
-    private int packageId;
+    private Long doctorId;
+    private Long clinicId;
+    private Long specialtyId;
+    private Long packageId;
 
     
 
