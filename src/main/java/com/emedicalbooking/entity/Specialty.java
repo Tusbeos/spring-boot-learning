@@ -31,6 +31,10 @@ public class Specialty {
     @Column(columnDefinition = "TEXT")
     private String descriptionMarkdown;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "statusId", referencedColumnName = "keyMap")
+    private AllCode statusData;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

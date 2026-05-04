@@ -11,6 +11,7 @@ com\emedicalbooking\entity\DoctorInfos.class
 com\emedicalbooking\exception\DuplicateEmailException.class
 com\emedicalbooking\dto\response\DoctorDetailResponse.class
 com\emedicalbooking\controller\BookingController.class
+com\emedicalbooking\constant\RoleConstants.class
 com\emedicalbooking\service\BookingService.class
 com\emedicalbooking\repository\PackageRepository.class
 com\emedicalbooking\exception\ResourceNotFoundException.class
@@ -41,6 +42,7 @@ com\emedicalbooking\dto\response\PackageResponse$PackageResponseBuilder.class
 com\emedicalbooking\dto\request\LoginRequest.class
 com\emedicalbooking\repository\HistoryRepository.class
 com\emedicalbooking\entity\Markdown.class
+com\emedicalbooking\security\LoginAttemptService.class
 com\emedicalbooking\service\impl\BookingCleanupScheduler.class
 com\emedicalbooking\config\SwaggerConfig.class
 com\emedicalbooking\dto\response\PackageServiceItemResponse$PackageServiceItemResponseBuilder.class
@@ -59,6 +61,7 @@ com\emedicalbooking\controller\UserController.class
 com\emedicalbooking\dto\response\SpecialtyResponse.class
 com\emedicalbooking\dto\response\SpecialtyResponse$SpecialtyResponseBuilder.class
 com\emedicalbooking\service\impl\HistoryServiceImpl.class
+com\emedicalbooking\config\RateLimitingFilter.class
 com\emedicalbooking\dto\request\ChangePasswordRequest.class
 com\emedicalbooking\dto\response\UserResponse.class
 com\emedicalbooking\dto\request\UpdateClinicRequest.class

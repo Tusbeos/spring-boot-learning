@@ -19,10 +19,7 @@ public class WeeklyResetScheduler {
     @Transactional
     public void resetWeeklyBookingCount() {
         log.info("Bắt đầu reset count đặt lịch tuần mới...");
-        doctorInfosRepository.findAll().forEach(info -> {
-            info.setCount(0);
-            doctorInfosRepository.save(info);
-        });
+        doctorInfosRepository.resetAllCounts();
         log.info("Đã reset count đặt lịch cho tất cả bác sĩ.");
     }
 }

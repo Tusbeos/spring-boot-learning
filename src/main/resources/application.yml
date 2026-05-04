@@ -28,8 +28,12 @@ spring:
 # Cấu hình riêng (không phải của Spring) - JwtTokenProvider đọc 2 giá trị này
 app:
   jwt:
-    secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+    # Key dài 64 ký tự hex (256 bits) an toàn cho HS256
+    secret: ${JWT_SECRET:8a4b6c3d9e2f1a5d8b7c4e1f2a3d9b6c8a4b6c3d9e2f1a5d8b7c4e1f2a3d9b6c}
     expiration-ms: 86400000 # 24h
+
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:4200}
 
   booking:
     # AES-256 key dùng mã hoá token gửi qua email (tối thiểu 32 ký tự)

@@ -57,6 +57,10 @@ public class DoctorInfos {
     @JoinColumn(name = "paymentId")
     private AllCode paymentData;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "statusId", referencedColumnName = "keyMap")
+    private AllCode statusData;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

@@ -8,7 +8,9 @@ import com.emedicalbooking.exception.DuplicateEmailException;
 import com.emedicalbooking.exception.ResourceNotFoundException;
 import com.emedicalbooking.repository.AllCodeRepository;
 import com.emedicalbooking.repository.UserRepository;
+import com.emedicalbooking.constant.RoleConstants;
 import com.emedicalbooking.security.JwtTokenProvider;
+import com.emedicalbooking.security.LoginAttemptService;
 import com.emedicalbooking.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +30,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final LoginAttemptService loginAttemptService;
 
     /**
      * Đăng ký tài khoản mới.
@@ -54,8 +57,8 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword())) // BCrypt hash
                 .phoneNumber(request.getPhoneNumber())
                 .address(request.getAddress())
-                .roleData(allCodeRepository.findByKeyMap("R3")
-                        .orElseThrow(() -> new ResourceNotFoundException("Role R3 không tồn tại")))
+                .roleData(allCodeRepository.findByKeyMap(RoleConstants.PATIENT)
+                        .orElseThrow(() -> new ResourceNotFoundException("Role " + RoleConstants.PATIENT + " không tồn tại")))
                 .build();
 
         // Bước 4: Lưu vào DB
@@ -85,14 +88,30 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthResponse login(LoginRequest request) {
+        String email = request.getEmail();
+
+        if (loginAttemptService.isBlocked(email)) {
+            throw new org.springframework.security.authentication.LockedException("Tài khoản đã bị khóa tạm thời do nhập sai mật khẩu quá nhiều lần. Vui lòng thử lại sau 15 phút.");
+        }
+
         // Lấy thông tin user (đã gộp fetch role để tránh lazy exception)
-        User user = userRepository.findByEmailWithRole(request.getEmail())
-                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("Email hoặc mật khẩu không đúng"));
+        User user = userRepository.findByEmailWithRole(email)
+                .orElseThrow(() -> {
+                    loginAttemptService.loginFailed(email);
+                    return new org.springframework.security.authentication.BadCredentialsException("Email hoặc mật khẩu không đúng");
+                });
 
         // Xác thực mật khẩu
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, request.getPassword())
+            );
+            // Đăng nhập thành công thì reset số lần thử
+            loginAttemptService.loginSucceeded(email);
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            loginAttemptService.loginFailed(email);
+            throw e;
+        }
 
         // Build UserDetails tay (tránh query DB lần 2)
         java.util.List<org.springframework.security.core.authority.SimpleGrantedAuthority> authorities = java.util.Collections.emptyList();

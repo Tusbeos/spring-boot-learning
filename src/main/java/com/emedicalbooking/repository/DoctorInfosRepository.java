@@ -2,6 +2,7 @@ package com.emedicalbooking.repository;
 
 import com.emedicalbooking.entity.DoctorInfos;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -25,4 +26,8 @@ public interface DoctorInfosRepository extends JpaRepository<DoctorInfos, Long> 
 
     // Lấy danh sách bác sĩ có count >= minCount, sắp xếp giảm dần
     List<DoctorInfos> findByCountGreaterThanEqualOrderByCountDesc(int count);
+
+    @Modifying
+    @Query("UPDATE DoctorInfos d SET d.count = 0")
+    void resetAllCounts();
 }

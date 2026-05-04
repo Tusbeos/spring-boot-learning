@@ -34,4 +34,6 @@ public interface DoctorService {
     List<Long> getDoctorIdsByClinicId(Long clinicId);
 
     List<PatientBookingResponse> getPatientsByDoctorAndDate(Long doctorId, String date);
+
+    void changeDoctorStatus(Long doctorId, String currentStatusKey, String nextStatusKey);
 }

@@ -342,6 +342,31 @@ public class DoctorServiceImpl implements DoctorService {
     // ===== Helper methods =====
 
     private DoctorListResponse toDoctorListResponse(User user, int count) {
+        String clinicName = "N/A";
+        String specialtyName = "N/A";
+        AllCode statusData = null;
+
+        // Fetch Clinic Name, Status from DoctorInfos
+        Optional<DoctorInfos> infoOpt = doctorInfosRepository.findByDoctorIdWithRelations(user.getId()).stream().findFirst();
+        if (infoOpt.isPresent()) {
+            DoctorInfos info = infoOpt.get();
+            if (info.getClinic() != null) {
+                clinicName = info.getClinic().getName();
+            } else if (info.getNameClinic() != null) {
+                clinicName = info.getNameClinic();
+            }
+            statusData = info.getStatusData();
+        }
+
+        // Fetch Specialty Name from DoctorClinicSpecialty
+        List<Long> specialtyIds = doctorClinicSpecialtyRepository.findSpecialtyIdsByDoctorId(user.getId());
+        if (!specialtyIds.isEmpty()) {
+            Optional<Specialty> specOpt = specialtyRepository.findById(specialtyIds.get(0));
+            if (specOpt.isPresent()) {
+                specialtyName = specOpt.get().getName();
+            }
+        }
+
         return DoctorListResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -351,6 +376,9 @@ public class DoctorServiceImpl implements DoctorService {
                 .positionData(toAllCodeResponse(user.getPositionData()))
                 .genderData(toAllCodeResponse(user.getGenderData()))
                 .count(count)
+                .specialtyName(specialtyName)
+                .clinicName(clinicName)
+                .statusData(toAllCodeResponse(statusData))
                 .build();
     }
 
@@ -372,5 +400,28 @@ public class DoctorServiceImpl implements DoctorService {
                 .filter(a -> a.getKeyMap().equals(keyMap))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", keyMap));
+    }
+    @Override
+    @Transactional
+    public void changeDoctorStatus(Long doctorId, String currentStatusKey, String nextStatusKey) {
+        DoctorInfos doctorInfos = doctorInfosRepository.findFirstByDoctorId(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("DoctorInfos", "doctorId", doctorId));
+
+        if (doctorInfos.getStatusData() != null) {
+            if (!doctorInfos.getStatusData().getKeyMap().equals(currentStatusKey)) {
+                throw new IllegalArgumentException("Trạng thái hiện tại của bác sĩ không phải là " + currentStatusKey);
+            }
+        } else {
+            // Nếu chưa có status, chỉ cho phép từ SD1
+            if (!currentStatusKey.equals("SD1")) {
+                throw new IllegalArgumentException("Bác sĩ chưa có trạng thái, vui lòng bắt đầu từ SD1");
+            }
+        }
+
+        AllCode nextStatus = allCodeRepository.findByKeyMap(nextStatusKey)
+                .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", nextStatusKey));
+
+        doctorInfos.setStatusData(nextStatus);
+        doctorInfosRepository.save(doctorInfos);
     }
 }

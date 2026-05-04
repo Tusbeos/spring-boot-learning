@@ -42,6 +42,9 @@ public class SecurityConfig {
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 
+    @Value("${app.cors.allowed-origins}")
+    private List<String> allowedOrigins;
+
     private static final String[] PUBLIC_URLS = {
             "/api/auth/**",
             "/swagger-ui/**",
@@ -69,9 +72,10 @@ public class SecurityConfig {
             "/api/bookings/verify"
     };
 
-    private static final String ROLE_ADMIN   = "R1";
-    private static final String ROLE_DOCTOR  = "R2";
-    private static final String ROLE_PATIENT = "R3";
+    private static final String ROLE_ADMIN   = com.emedicalbooking.constant.RoleConstants.ADMIN;
+    private static final String ROLE_DOCTOR  = com.emedicalbooking.constant.RoleConstants.DOCTOR;
+    private static final String ROLE_PATIENT = com.emedicalbooking.constant.RoleConstants.PATIENT;
+    private static final String ROLE_CLINIC_MANAGER = com.emedicalbooking.constant.RoleConstants.CLINIC_MANAGER;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -87,6 +91,7 @@ public class SecurityConfig {
 
                 // Admin CRUD users + bệnh nhân có thể tự cập nhật thông tin cá nhân
                 .requestMatchers("/api/admin/**").hasRole(ROLE_ADMIN)
+                .requestMatchers("/api/clinic-manager/**").hasRole(ROLE_CLINIC_MANAGER)
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/users").hasRole(ROLE_ADMIN)
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/{id}").authenticated()
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/users/{id}/change-password").authenticated()
@@ -187,11 +192,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "http://localhost:3000",   // React dev
-                "http://localhost:5173",   // Vite dev
-                "http://localhost:4200"    // Angular dev
-        ));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

@@ -46,6 +46,10 @@ public class MedicalPackage {
     @OneToMany(mappedBy = "medicalPackage", fetch = FetchType.LAZY)
     private List<PackageServiceItem> packageServices;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "statusId", referencedColumnName = "keyMap")
+    private AllCode statusData;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
