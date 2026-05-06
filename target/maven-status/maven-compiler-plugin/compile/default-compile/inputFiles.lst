@@ -31,6 +31,7 @@ D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\service\impl
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\repository\PackageServiceItemRepository.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\service\impl\SpecialtyServiceImpl.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\dto\response\DoctorListResponse.java
+D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\dto\response\DoctorPageResponse.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\service\DoctorService.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\service\impl\AuthServiceImpl.java
 D:\Code\Java\BE\e-medical-booking\src\main\java\com\emedicalbooking\repository\AllCodeRepository.java

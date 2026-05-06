@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev} # Mặc định là profile 'dev' nếu không được truyền vào
   
@@ -44,3 +48,6 @@ app:
 # ==================== SERVER ====================
 server:
   port: 8888
+  tomcat:
+    max-http-form-post-size: 20MB
+    max-swallow-size: 20MB

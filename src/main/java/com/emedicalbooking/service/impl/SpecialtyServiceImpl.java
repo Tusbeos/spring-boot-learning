@@ -3,8 +3,10 @@ package com.emedicalbooking.service.impl;
 import com.emedicalbooking.dto.request.CreateSpecialtyRequest;
 import com.emedicalbooking.dto.request.UpdateSpecialtyRequest;
 import com.emedicalbooking.dto.response.SpecialtyResponse;
+import com.emedicalbooking.entity.AllCode;
 import com.emedicalbooking.entity.Specialty;
 import com.emedicalbooking.exception.ResourceNotFoundException;
+import com.emedicalbooking.repository.AllCodeRepository;
 import com.emedicalbooking.repository.DoctorClinicSpecialtyRepository;
 import com.emedicalbooking.repository.SpecialtyRepository;
 import com.emedicalbooking.service.SpecialtyService;
@@ -22,15 +24,18 @@ public class SpecialtyServiceImpl implements SpecialtyService {
 
     private final SpecialtyRepository specialtyRepository;
     private final DoctorClinicSpecialtyRepository doctorClinicSpecialtyRepository;
+    private final AllCodeRepository allCodeRepository;
 
     @Override
     @Transactional
     public void createSpecialty(CreateSpecialtyRequest request) {
+        AllCode sd1 = allCodeRepository.findByKeyMap("SD1").orElse(null);
         Specialty specialty = Specialty.builder()
                 .name(request.getName())
                 .descriptionHTML(request.getDescriptionHTML())
                 .descriptionMarkdown(request.getDescriptionMarkdown())
                 .image(decodeBase64Image(request.getImageBase64()))
+                .statusData(sd1)
                 .build();
         specialtyRepository.save(specialty);
     }

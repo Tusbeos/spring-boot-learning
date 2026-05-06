@@ -33,6 +33,9 @@ public class UserResponse {
     private String positionId;
     private String positionVi;
 
+    private Long clinicId;
+    private String clinicName;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -45,15 +48,25 @@ public class UserResponse {
                 .lastName(user.getLastName())
                 .address(user.getAddress())
                 .phoneNumber(user.getPhoneNumber())
-                .image(user.getImage() != null ? Base64.getEncoder().encodeToString(user.getImage()) : null)
+                .image(resolveImage(user))
                 .roleId(user.getRoleData() != null ? user.getRoleData().getKeyMap() : null)
                 .roleVi(user.getRoleData() != null ? user.getRoleData().getValueVi() : null)
                 .gender(user.getGenderData() != null ? user.getGenderData().getKeyMap() : null)
                 .genderVi(user.getGenderData() != null ? user.getGenderData().getValueVi() : null)
                 .positionId(user.getPositionData() != null ? user.getPositionData().getKeyMap() : null)
                 .positionVi(user.getPositionData() != null ? user.getPositionData().getValueVi() : null)
+                .clinicId(user.getClinic() != null ? user.getClinic().getId() : null)
+                .clinicName(user.getClinic() != null ? user.getClinic().getName() : null)
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
+    }
+
+    private static String resolveImage(User user) {
+        byte[] image = user.getImage();
+        if (image == null && user.getClinic() != null) {
+            image = user.getClinic().getImage();
+        }
+        return image != null ? Base64.getEncoder().encodeToString(image) : null;
     }
 }

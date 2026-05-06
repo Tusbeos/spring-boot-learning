@@ -30,6 +30,16 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getAllDoctors()));
     }
 
+    @GetMapping("/paginated")
+    public ResponseEntity<ApiResponse<DoctorPageResponse>> getDoctorsPaginated(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String specialty,
+            @RequestParam(required = false) String clinic) {
+        return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getDoctorsPaginated(page, limit, search, specialty, clinic)));
+    }
+
     @PostMapping("/{doctorId}/info")
     public ResponseEntity<ApiResponse<Void>> saveDoctorInfo(
             @PathVariable Long doctorId,

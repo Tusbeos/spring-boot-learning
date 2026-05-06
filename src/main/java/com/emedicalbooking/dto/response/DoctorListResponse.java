@@ -20,5 +20,6 @@ public class DoctorListResponse {
     private int count; // số lượt đặt — dùng cho TopDoctor
     private String specialtyName;
     private String clinicName;
+    private String statusId;
     private AllCodeResponse statusData;
 }

@@ -24,6 +24,11 @@ public interface DoctorInfosRepository extends JpaRepository<DoctorInfos, Long> 
     @Query("SELECT di.doctor.id FROM DoctorInfos di WHERE di.clinic.id = :clinicId")
     List<Long> findDoctorIdsByClinicId(@Param("clinicId") Long clinicId);
 
+    @Query("SELECT di.doctor.id FROM DoctorInfos di " +
+           "WHERE di.nameClinic IS NOT NULL " +
+           "AND LOWER(TRIM(di.nameClinic)) = LOWER(TRIM(:clinicName))")
+    List<Long> findDoctorIdsByClinicName(@Param("clinicName") String clinicName);
+
     // Lấy danh sách bác sĩ có count >= minCount, sắp xếp giảm dần
     List<DoctorInfos> findByCountGreaterThanEqualOrderByCountDesc(int count);
 

@@ -21,5 +21,6 @@ public class CreateUserRequest {
     private String gender;
     private String roleId;
     private String positionId;
+    private Long clinicId;
     private String avatar; // base64
 }

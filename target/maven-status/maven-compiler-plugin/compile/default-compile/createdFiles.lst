@@ -33,6 +33,7 @@ com\emedicalbooking\dto\response\HistoryResponse$HistoryResponseBuilder.class
 com\emedicalbooking\dto\request\CreatePatientProfileRequest.class
 com\emedicalbooking\job\BookingCleanupJob.class
 com\emedicalbooking\dto\response\AuthResponse.class
+com\emedicalbooking\config\DoctorStatusSeeder.class
 com\emedicalbooking\dto\response\ApiResponse$ApiResponseBuilder.class
 com\emedicalbooking\controller\AllCodeController.class
 com\emedicalbooking\EMedicalBookingApplication.class
@@ -42,6 +43,7 @@ com\emedicalbooking\dto\response\PackageResponse$PackageResponseBuilder.class
 com\emedicalbooking\dto\request\LoginRequest.class
 com\emedicalbooking\repository\HistoryRepository.class
 com\emedicalbooking\entity\Markdown.class
+com\emedicalbooking\dto\response\DoctorPageResponse.class
 com\emedicalbooking\security\LoginAttemptService.class
 com\emedicalbooking\service\impl\BookingCleanupScheduler.class
 com\emedicalbooking\config\SwaggerConfig.class
@@ -125,6 +127,7 @@ com\emedicalbooking\dto\response\DoctorListResponse.class
 com\emedicalbooking\dto\response\DoctorExtraInfoResponse.class
 com\emedicalbooking\entity\Schedule$ScheduleBuilder.class
 com\emedicalbooking\entity\History$HistoryBuilder.class
+com\emedicalbooking\controller\ClinicManagerController.class
 com\emedicalbooking\repository\DoctorInfosRepository.class
 com\emedicalbooking\repository\PackageServiceItemRepository.class
 com\emedicalbooking\exception\GlobalExceptionHandler.class
@@ -133,6 +136,7 @@ com\emedicalbooking\dto\request\UpdateSpecialtyRequest.class
 com\emedicalbooking\entity\DoctorInfos$DoctorInfosBuilder.class
 com\emedicalbooking\dto\response\UserResponse$UserResponseBuilder.class
 com\emedicalbooking\service\UserService.class
+com\emedicalbooking\dto\response\DoctorPageResponse$DoctorPageResponseBuilder.class
 com\emedicalbooking\entity\PatientProfile$PatientProfileBuilder.class
 com\emedicalbooking\service\impl\ClinicServiceImpl.class
 com\emedicalbooking\entity\PatientProfile.class

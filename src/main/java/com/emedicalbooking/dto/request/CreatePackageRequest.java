@@ -24,6 +24,8 @@ public class CreatePackageRequest {
 
     private String note;
 
+    private String statusId;
+
     private String imageBase64;
 
     private String descriptionHTML;

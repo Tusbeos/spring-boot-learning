@@ -141,6 +141,8 @@ public class AuthServiceImpl implements AuthService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .roleId(user.getRoleData() != null ? user.getRoleData().getKeyMap() : null)
+                .clinicId(user.getClinic() != null ? user.getClinic().getId() : null)
+                .clinicName(user.getClinic() != null ? user.getClinic().getName() : null)
                 .build();
     }
 
@@ -183,6 +185,8 @@ public class AuthServiceImpl implements AuthService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .roleId(user.getRoleData() != null ? user.getRoleData().getKeyMap() : null)
+                .clinicId(user.getClinic() != null ? user.getClinic().getId() : null)
+                .clinicName(user.getClinic() != null ? user.getClinic().getName() : null)
                 .build();
     }
 

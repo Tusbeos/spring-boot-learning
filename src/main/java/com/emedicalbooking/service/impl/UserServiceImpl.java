@@ -5,10 +5,12 @@ import com.emedicalbooking.dto.request.CreateUserRequest;
 import com.emedicalbooking.dto.request.UpdateUserRequest;
 import com.emedicalbooking.dto.response.UserResponse;
 import com.emedicalbooking.entity.AllCode;
+import com.emedicalbooking.entity.Clinic;
 import com.emedicalbooking.entity.User;
 import com.emedicalbooking.exception.DuplicateEmailException;
 import com.emedicalbooking.exception.ResourceNotFoundException;
 import com.emedicalbooking.repository.AllCodeRepository;
+import com.emedicalbooking.repository.ClinicRepository;
 import com.emedicalbooking.repository.UserRepository;
 import com.emedicalbooking.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final AllCodeRepository allCodeRepository;
+    private final ClinicRepository clinicRepository;
+    private final com.emedicalbooking.repository.DoctorInfosRepository doctorInfosRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -70,11 +74,22 @@ public class UserServiceImpl implements UserService {
         if (request.getPositionId() != null) {
             user.setPositionData(findAllCode(request.getPositionId()));
         }
+        applyClinicManagerAssignment(user, request.getRoleId(), request.getClinicId());
         if (request.getAvatar() != null) {
             user.setImage(decodeBase64Image(request.getAvatar()));
         }
 
         userRepository.save(user);
+
+        // Nếu là bác sĩ (R2), tạo mặc định DoctorInfos với status SD1
+        if ("R2".equals(request.getRoleId())) {
+            AllCode sd1 = allCodeRepository.findByKeyMap("SD1").orElse(null);
+            com.emedicalbooking.entity.DoctorInfos doctorInfo = com.emedicalbooking.entity.DoctorInfos.builder()
+                    .doctor(user)
+                    .statusData(sd1)
+                    .build();
+            doctorInfosRepository.save(doctorInfo);
+        }
     }
 
     @Override
@@ -98,7 +113,9 @@ public class UserServiceImpl implements UserService {
         if (request.getAddress() != null) user.setAddress(request.getAddress());
         if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
 
-        user.setGenderData(findAllCode(request.getGender()));
+        if (request.getGender() != null) {
+            user.setGenderData(findAllCode(request.getGender()));
+        }
 
         // Chỉ Admin mới được thay đổi role và position
         if (isAdmin) {
@@ -108,6 +125,7 @@ public class UserServiceImpl implements UserService {
             if (request.getPositionId() != null) {
                 user.setPositionData(findAllCode(request.getPositionId()));
             }
+            applyClinicManagerAssignment(user, request.getRoleId(), request.getClinicId());
         }
 
         if (request.getAvatar() != null) {
@@ -136,6 +154,20 @@ public class UserServiceImpl implements UserService {
         if (keyMap == null) return null;
         return allCodeRepository.findByKeyMap(keyMap)
                 .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", keyMap));
+    }
+
+    private void applyClinicManagerAssignment(User user, String roleId, Long clinicId) {
+        if (!"R4".equals(roleId)) {
+            user.setClinic(null);
+            return;
+        }
+        if (clinicId == null) {
+            throw new IllegalArgumentException("Clinic Manager phải được phân quyền quản lý một cơ sở y tế");
+        }
+        Clinic clinic = clinicRepository.findById(clinicId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", clinicId));
+        user.setClinic(clinic);
+        user.setImage(clinic.getImage());
     }
 
     @Override

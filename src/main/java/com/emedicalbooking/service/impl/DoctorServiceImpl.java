@@ -51,6 +51,51 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public DoctorPageResponse getDoctorsPaginated(int page, int limit, String search, String specialty, String clinic) {
+        List<DoctorListResponse> allDocs = getAllDoctors();
+
+        // Lọc theo search
+        if (search != null && !search.trim().isEmpty()) {
+            String q = search.toLowerCase().trim();
+            allDocs = allDocs.stream()
+                    .filter(d -> (d.getFirstName() != null && d.getFirstName().toLowerCase().contains(q)) ||
+                                 (d.getLastName() != null && d.getLastName().toLowerCase().contains(q)))
+                    .collect(Collectors.toList());
+        }
+
+        // Lọc theo specialty
+        if (specialty != null && !specialty.trim().isEmpty() && !specialty.equals("All Specialties")) {
+            allDocs = allDocs.stream()
+                    .filter(d -> specialty.equals(d.getSpecialtyName()))
+                    .collect(Collectors.toList());
+        }
+
+        // Lọc theo clinic
+        if (clinic != null && !clinic.trim().isEmpty() && !clinic.equals("All Facilities")) {
+            allDocs = allDocs.stream()
+                    .filter(d -> clinic.equals(d.getClinicName()))
+                    .collect(Collectors.toList());
+        }
+
+        int totalElements = allDocs.size();
+        int totalPages = (int) Math.ceil((double) totalElements / limit);
+        if (page < 1) page = 1;
+
+        List<DoctorListResponse> pagedDocs = allDocs.stream()
+                .skip((long) (page - 1) * limit)
+                .limit(limit)
+                .collect(Collectors.toList());
+
+        return DoctorPageResponse.builder()
+                .doctors(pagedDocs)
+                .totalPages(totalPages)
+                .totalElements(totalElements)
+                .currentPage(page)
+                .build();
+    }
+
+    @Override
     @Transactional
     public void saveDoctorInfo(Long doctorId, SaveDoctorInfoRequest request) {
         User doctor = userRepository.findById(doctorId)
@@ -75,8 +120,9 @@ public class DoctorServiceImpl implements DoctorService {
         }
 
         // Upsert DoctorInfos
+        AllCode sd1 = allCodeRepository.findByKeyMap("SD1").orElse(null);
         DoctorInfos doctorInfo = doctorInfosRepository.findFirstByDoctorId(doctorId)
-                .orElse(DoctorInfos.builder().doctor(doctor).build());
+                .orElse(DoctorInfos.builder().doctor(doctor).statusData(sd1).build());
 
         doctorInfo.setNameClinic(request.getNameClinic());
         doctorInfo.setAddressClinic(request.getAddressClinic());
@@ -292,7 +338,36 @@ public class DoctorServiceImpl implements DoctorService {
         // 2. DoctorClinicSpecialty.clinicId – bác sĩ được gán chuyên khoa tại cơ sở này
         Set<Long> result = new LinkedHashSet<>(doctorInfosRepository.findDoctorIdsByClinicId(clinicId));
         result.addAll(doctorClinicSpecialtyRepository.findDoctorIdsByClinicId(clinicId));
+        clinicRepository.findById(clinicId)
+                .map(Clinic::getName)
+                .filter(name -> name != null && !name.trim().isEmpty())
+                .ifPresent(name -> result.addAll(doctorInfosRepository.findDoctorIdsByClinicName(name)));
         return new ArrayList<>(result);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DoctorListResponse> getDoctorsByClinicId(Long clinicId) {
+        Set<Long> linkedDoctorIds = new LinkedHashSet<>(getDoctorIdsByClinicId(clinicId));
+        List<DoctorListResponse> doctors = linkedDoctorIds.stream()
+                .map(userRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(this::toDoctorListResponse)
+                .collect(Collectors.toList());
+
+        clinicRepository.findById(clinicId)
+                .map(Clinic::getName)
+                .filter(name -> name != null && !name.trim().isEmpty())
+                .ifPresent(clinicName -> getAllDoctors().stream()
+                        .filter(doctor -> clinicNameMatches(doctor.getClinicName(), clinicName))
+                        .filter(doctor -> doctor.getId() != null && !linkedDoctorIds.contains(doctor.getId()))
+                        .forEach(doctor -> {
+                            linkedDoctorIds.add(doctor.getId());
+                            doctors.add(doctor);
+                        }));
+
+        return doctors;
     }
 
     @Override
@@ -378,6 +453,7 @@ public class DoctorServiceImpl implements DoctorService {
                 .count(count)
                 .specialtyName(specialtyName)
                 .clinicName(clinicName)
+                .statusId(statusData != null ? statusData.getKeyMap() : null)
                 .statusData(toAllCodeResponse(statusData))
                 .build();
     }
@@ -401,6 +477,22 @@ public class DoctorServiceImpl implements DoctorService {
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", keyMap));
     }
+
+    private boolean clinicNameMatches(String doctorClinicName, String clinicName) {
+        String left = normalizeClinicName(doctorClinicName);
+        String right = normalizeClinicName(clinicName);
+        if (left.isEmpty() || right.isEmpty()) return false;
+        return left.equals(right) || left.contains(right) || right.contains(left);
+    }
+
+    private String normalizeClinicName(String value) {
+        if (value == null) return "";
+        String normalized = java.text.Normalizer.normalize(value, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        return normalized.toLowerCase(Locale.ROOT)
+                .replaceAll("[^\\p{Alnum}]+", " ")
+                .trim();
+    }
     @Override
     @Transactional
     public void changeDoctorStatus(Long doctorId, String currentStatusKey, String nextStatusKey) {
@@ -420,6 +512,19 @@ public class DoctorServiceImpl implements DoctorService {
 
         AllCode nextStatus = allCodeRepository.findByKeyMap(nextStatusKey)
                 .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", nextStatusKey));
+
+        doctorInfos.setStatusData(nextStatus);
+        doctorInfosRepository.save(doctorInfos);
+    }
+
+    @Override
+    @Transactional
+    public void setDoctorStatus(Long doctorId, String statusKey) {
+        DoctorInfos doctorInfos = doctorInfosRepository.findFirstByDoctorId(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("DoctorInfos", "doctorId", doctorId));
+
+        AllCode nextStatus = allCodeRepository.findByKeyMap(statusKey)
+                .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", statusKey));
 
         doctorInfos.setStatusData(nextStatus);
         doctorInfosRepository.save(doctorInfos);

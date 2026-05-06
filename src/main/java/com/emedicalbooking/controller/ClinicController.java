@@ -4,6 +4,7 @@ import com.emedicalbooking.dto.request.CreateClinicRequest;
 import com.emedicalbooking.dto.request.UpdateClinicRequest;
 import com.emedicalbooking.dto.response.ApiResponse;
 import com.emedicalbooking.dto.response.ClinicResponse;
+import com.emedicalbooking.dto.response.DoctorListResponse;
 import com.emedicalbooking.service.ClinicService;
 import com.emedicalbooking.service.DoctorService;
 import jakarta.validation.Valid;
@@ -42,8 +43,8 @@ public class ClinicController {
     }
 
     @GetMapping("/{clinicId}/doctors")
-    public ResponseEntity<ApiResponse<List<Long>>> getDoctorsByClinicId(@PathVariable Long clinicId) {
-        return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getDoctorIdsByClinicId(clinicId)));
+    public ResponseEntity<ApiResponse<List<DoctorListResponse>>> getDoctorsByClinicId(@PathVariable Long clinicId) {
+        return ResponseEntity.ok(ApiResponse.success("OK", doctorService.getDoctorsByClinicId(clinicId)));
     }
 
     @PutMapping("/{id}")

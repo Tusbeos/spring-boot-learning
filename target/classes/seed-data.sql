@@ -20,6 +20,11 @@ INSERT IGNORE INTO all_codes (key_map, type, value_en, value_vi) VALUES
 ('R2',   'ROLE',     'Doctor',                   'Bác sĩ'),
 ('R3',   'ROLE',     'Patient',                  'Bệnh nhân'),
 ('R4',   'ROLE',     'Clinic Manager',           'Quản lý phòng khám'),
+-- APPROVAL_REQUEST_STATUS
+('AR1',  'APPROVAL_REQUEST_STATUS', 'Pending',   'Cho duyet'),
+('AR2',  'APPROVAL_REQUEST_STATUS', 'Approved',  'Da duyet'),
+('AR3',  'APPROVAL_REQUEST_STATUS', 'Rejected',  'Tu choi'),
+('AR4',  'APPROVAL_REQUEST_STATUS', 'Cancelled', 'Da huy'),
 -- STATUS booking
 ('S1',   'STATUS',   'New',                      'Lịch hẹn mới'),
 ('S2',   'STATUS',   'Confirmed',                'Đã xác nhận'),

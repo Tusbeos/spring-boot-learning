@@ -49,6 +49,10 @@ public class User {
     @JoinColumn(name = "roleId", referencedColumnName = "keyMap")
     private AllCode roleData;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "clinicId")
+    private Clinic clinic;
+
     @OneToOne(mappedBy = "doctor", fetch = FetchType.LAZY)
     private DoctorInfos doctorInfo;
 

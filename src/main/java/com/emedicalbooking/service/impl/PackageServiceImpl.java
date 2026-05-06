@@ -45,10 +45,17 @@ public class PackageServiceImpl implements PackageService {
         Clinic clinic = clinicRepository.findById(request.getClinicId())
                 .orElseThrow(() -> new ResourceNotFoundException("Clinic", "id", request.getClinicId()));
 
+        String statusKey = request.getStatusId() != null && !request.getStatusId().isBlank()
+                ? request.getStatusId()
+                : "SD1";
+        AllCode statusData = allCodeRepository.findByKeyMap(statusKey)
+                .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", statusKey));
+
         MedicalPackage pkg = MedicalPackage.builder()
                 .name(request.getName())
                 .typeData(typeData)
                 .clinic(clinic)
+                .statusData(statusData)
                 .price(request.getPrice())
                 .note(request.getNote())
                 .image(request.getImageBase64() != null ? decodeBase64Image(request.getImageBase64()) : null)
@@ -86,6 +93,14 @@ public class PackageServiceImpl implements PackageService {
         MedicalPackage pkg = packageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Package", "id", id));
         return toResponse(pkg);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PackageResponse> getPackagesByClinicId(Long clinicId) {
+        return packageRepository.findByClinic_Id(clinicId).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -141,6 +156,22 @@ public class PackageServiceImpl implements PackageService {
         packageRepository.delete(pkg);
     }
 
+    @Override
+    @Transactional
+    public void changePackageStatus(Long packageId, String currentStatusKey, String nextStatusKey) {
+        MedicalPackage pkg = packageRepository.findById(packageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Package", "id", packageId));
+
+        if (pkg.getStatusData() != null && !currentStatusKey.equals(pkg.getStatusData().getKeyMap())) {
+            throw new IllegalArgumentException("Trang thai hien tai cua goi kham khong phai la " + currentStatusKey);
+        }
+
+        AllCode nextStatus = allCodeRepository.findByKeyMap(nextStatusKey)
+                .orElseThrow(() -> new ResourceNotFoundException("AllCode", "keyMap", nextStatusKey));
+        pkg.setStatusData(nextStatus);
+        packageRepository.save(pkg);
+    }
+
     // ==================== Helper ====================
 
     /** Lưu danh sách dịch vụ cho một gói khám */
@@ -164,15 +195,8 @@ public class PackageServiceImpl implements PackageService {
     }
 
     private PackageResponse toResponse(MedicalPackage pkg) {
-        // Map AllCode typeData
-        AllCodeResponse typeDataRes = null;
-        if (pkg.getTypeData() != null) {
-            typeDataRes = AllCodeResponse.builder()
-                    .keyMap(pkg.getTypeData().getKeyMap())
-                    .valueEn(pkg.getTypeData().getValueEn())
-                    .valueVi(pkg.getTypeData().getValueVi())
-                    .build();
-        }
+        AllCodeResponse typeDataRes = toAllCodeResponse(pkg.getTypeData());
+        AllCodeResponse statusDataRes = toAllCodeResponse(pkg.getStatusData());
 
         // Map danh sách dịch vụ
         List<PackageServiceItemResponse> serviceItems = pkg.getPackageServices() == null ? List.of() :
@@ -199,6 +223,8 @@ public class PackageServiceImpl implements PackageService {
                 .name(pkg.getName())
                 .typeCode(pkg.getTypeData() != null ? pkg.getTypeData().getKeyMap() : null)
                 .typeData(typeDataRes)
+                .statusId(pkg.getStatusData() != null ? pkg.getStatusData().getKeyMap() : null)
+                .statusData(statusDataRes)
                 .clinicId(pkg.getClinic() != null ? pkg.getClinic().getId() : 0)
                 .clinicName(pkg.getClinic() != null ? pkg.getClinic().getName() : null)
                 .price(pkg.getPrice())
@@ -213,6 +239,18 @@ public class PackageServiceImpl implements PackageService {
     }
 
     /** Xử lý cả 2 dạng: chuỗi base64 thuần và data URI (data:image/...;base64,...) */
+    private AllCodeResponse toAllCodeResponse(AllCode allCode) {
+        if (allCode == null) {
+            return null;
+        }
+
+        return AllCodeResponse.builder()
+                .keyMap(allCode.getKeyMap())
+                .valueEn(allCode.getValueEn())
+                .valueVi(allCode.getValueVi())
+                .build();
+    }
+
     private byte[] decodeBase64Image(String imageBase64) {
         String pure = imageBase64.contains(",")
                 ? imageBase64.substring(imageBase64.indexOf(',') + 1)

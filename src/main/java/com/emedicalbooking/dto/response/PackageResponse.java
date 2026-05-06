@@ -16,6 +16,8 @@ public class PackageResponse {
     private String name;
     private String typeCode;
     private AllCodeResponse typeData;
+    private String statusId;
+    private AllCodeResponse statusData;
     private Long clinicId;
     private String clinicName;
     private int price;

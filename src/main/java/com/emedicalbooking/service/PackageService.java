@@ -12,9 +12,13 @@ public interface PackageService {
 
     List<PackageResponse> getAllPackages(Integer limit);
 
+    List<PackageResponse> getPackagesByClinicId(Long clinicId);
+
     PackageResponse getPackageById(Long id);
 
     void updatePackage(Long id, UpdatePackageRequest request);
 
     void deletePackage(Long id);
+
+    void changePackageStatus(Long packageId, String currentStatusKey, String nextStatusKey);
 }

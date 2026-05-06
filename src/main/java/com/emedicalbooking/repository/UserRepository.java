@@ -11,16 +11,18 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
-    Optional<User> findByRefreshToken(String refreshToken);
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roleData LEFT JOIN FETCH u.clinic WHERE u.refreshToken = :refreshToken")
+    Optional<User> findByRefreshToken(@Param("refreshToken") String refreshToken);
 
     // JOIN FETCH roleData để tránh LazyInitializationException khi load role
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roleData WHERE u.email = :email")
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roleData LEFT JOIN FETCH u.clinic WHERE u.email = :email")
     Optional<User> findByEmailWithRole(@Param("email") String email);
 
     // Lấy tất cả user kèm roleData, genderData, positionData (1 câu SQL, tránh N+1)
     @Query("SELECT u FROM User u " +
            "LEFT JOIN FETCH u.roleData " +
            "LEFT JOIN FETCH u.genderData " +
-           "LEFT JOIN FETCH u.positionData")
+           "LEFT JOIN FETCH u.positionData " +
+           "LEFT JOIN FETCH u.clinic")
     List<User> findAllWithRelations();
 }

@@ -19,4 +19,6 @@ public class AuthResponse {
     private String firstName;
     private String lastName;
     private String roleId;
+    private Long clinicId;
+    private String clinicName;
 }

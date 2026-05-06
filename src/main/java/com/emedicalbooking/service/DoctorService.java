@@ -13,6 +13,8 @@ public interface DoctorService {
 
     List<DoctorListResponse> getAllDoctors();
 
+    DoctorPageResponse getDoctorsPaginated(int page, int limit, String search, String specialty, String clinic);
+
     void saveDoctorInfo(Long doctorId, SaveDoctorInfoRequest request);
 
     DoctorDetailResponse getDoctorDetail(Long doctorId);
@@ -33,7 +35,11 @@ public interface DoctorService {
 
     List<Long> getDoctorIdsByClinicId(Long clinicId);
 
+    List<DoctorListResponse> getDoctorsByClinicId(Long clinicId);
+
     List<PatientBookingResponse> getPatientsByDoctorAndDate(Long doctorId, String date);
 
     void changeDoctorStatus(Long doctorId, String currentStatusKey, String nextStatusKey);
+
+    void setDoctorStatus(Long doctorId, String statusKey);
 }
